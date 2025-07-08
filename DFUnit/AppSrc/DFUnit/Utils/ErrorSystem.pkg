@@ -1,4 +1,4 @@
-Use Dferror.pkg
+﻿Use Dferror.pkg
 
 Use DFUnit\Globals.pkg
 
@@ -125,7 +125,7 @@ CompilerWarnings On
             Get Is_Critical iErrNum to oInfo.bFatal
             Move (not(IsUnhandledError(Self, iErrNum))) to oInfo.bUser
             
-            Send TrackError of ghoErrorTracker oInfo
+//            Send TrackError of ghoErrorTracker oInfo
         End
         
         // mark that we are no longer processing an error 
