@@ -1,4 +1,4 @@
-Use VdfBase.pkg
+﻿Use VdfBase.pkg
 Use gFormatNumbers.pkg
 
 Use DFUnit\Testing\Test.pkg
@@ -24,16 +24,16 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
         Property String psLine "----------------------------------------------------------------------"
         
         { Visibility=Private }
-        Property Integer piIndentationIncrease 4
+        Property Integer piIndentationIncrease 2
     End_Procedure
     
     Procedure StartFixture Handle hEnv
         Handle hFixture
-        Get Current_Fixture of hEnv to hFixture
         
-        Send IncreaseScope
+        Get Current_Fixture of hEnv to hFixture
         Set TextBackColor to clEditorBackGround
         Send PrintLn (FixtureName(hFixture))
+        Send IncreaseScope
     End_Procedure
     
     Procedure EndFixture Handle hEnv
@@ -42,8 +42,8 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
     
     Procedure StartTest Handle hEnv
         Handle hTest
-        Get Current_Test of hEnv to hTest
         
+        Get Current_Test of hEnv to hTest
         Send IncreaseScope
         Send Print (TestName(hTest))
     End_Procedure
@@ -165,10 +165,10 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
     
     { Visibility=Private }
     Function ScopeIndentation Returns String
+        Integer iScope
+            
         If (pbNewLine(Self) = False) ;
             Function_Return ""
-            
-        Integer iScope
         Get CurrentScope to iScope
         Function_Return (Repeat(" ", iScope * piIndentationIncrease(Self)))
     End_Function
