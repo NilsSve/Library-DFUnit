@@ -1,4 +1,4 @@
-﻿Use cRichEdit.pkg
+Use cRichEdit.pkg
 #IFNDEF clEditorBackGround
     Define clEditorBackGround for (RGB(36, 49, 68)) // HTML 243144
 #ENDIF
@@ -73,11 +73,13 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         
         { Visibility=Private }
         Property String[] paMessages
+        Property Integer piLineNumber 1
     End_Procedure
     
     Procedure Start Handle hEnv
         String[] aMessages
         
+        Set piLineNumber to 1
         Forward Send Start      
         // This will set the array to zero for each run:
         Move "" to aMessages[SizeOfArray(aMessages)]
@@ -115,16 +117,31 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         Loop
     End_Procedure
     
+    // Returns a four "digit" string line number with the format: 0001 to 9999
+    // Pad string with up to 3 zeroes, depending on the size of iLineNumber
+    Function PadStringWithZeroes Integer iLineNumber Returns String
+        String sRetval
+        Move (FillString("0", (4 - Length(iLineNumber)))) to sRetval
+        Append sRetval iLineNumber
+        Function_Return sRetval
+    End_Function
+    
     { Visibility=Private }
     Procedure Print String sLine
-        String sIndentation
+        String sIndentation sLineNumber
         String[] aMessages
+        Integer iLineNumber
+        
+        Get piLineNumber to iLineNumber
+        Get PadStringWithZeroes iLineNumber to sLineNumber
+        Increment iLineNumber
+        Set piLineNumber to iLineNumber
         
         Get ScopeIndentation to sIndentation
         Get paMessages to aMessages
         
         If (pbNewLine(Self) = True) Begin
-            Move (String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1] 
+            Move (sLineNumber + "  " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
             // This removes the "at line number" comment, so don't use for now
 //            Move (String(SizeOfArray(aMessages)) + " " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
         End

@@ -1,4 +1,4 @@
-﻿Use VdfBase.pkg
+Use VdfBase.pkg
 Use gFormatNumbers.pkg
 
 Use DFUnit\Testing\Test.pkg
@@ -33,7 +33,9 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
         Get Current_Fixture of hEnv to hFixture
         Set TextBackColor to clEditorBackGround
         Send PrintLn (FixtureName(hFixture))
-        Send IncreaseScope
+        If (Lowercase(FixtureName(hFixture)) <> "all tests") Begin
+            Send IncreaseScope
+        End
     End_Procedure
     
     Procedure EndFixture Handle hEnv
