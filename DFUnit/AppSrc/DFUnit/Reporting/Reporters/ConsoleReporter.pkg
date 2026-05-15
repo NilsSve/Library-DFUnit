@@ -11,7 +11,13 @@ Class cDFUnitConsoleReporter is a IReporter_Mixin
         
         Send Define_cDFUnitLineBasedReporter_Mixin
     End_Procedure
-    
+
+    // The shared cDFUnitLineBasedReporter_Mixin styles output with the cRichEdit
+    // message Set TextBackColor. A console reporter is non-visual and has no such
+    // message, so absorb it here as a no-op (the UI reporter keeps the real one).
+    Procedure Set TextBackColor Integer iColor
+    End_Procedure
+
     Procedure Start Handle hEnv
     End_Procedure
     

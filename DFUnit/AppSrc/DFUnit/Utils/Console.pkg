@@ -1,14 +1,25 @@
 ﻿Use Windows.pkg
 
 { Visibility=Private }
-External_Function DFUnit_WinAPI_ExitProcess "ExitProcess" Kernel32.dll Integer iExitCode Returns Integer
+External_Function DFUnit_WinAPI_TerminateProcess "TerminateProcess" Kernel32.dll Handle hProcess Integer iExitCode Returns Integer
 
+// A unit-test build runner only needs to emit its results and return an exit
+// code, then die. ExitProcess runs DLL_PROCESS_DETACH for every loaded DLL;
+// with the heavy COM/ActiveX UI a host app may instantiate (e.g. CodeJock
+// command bars, Scintilla) that teardown can deadlock and the process then
+// never ends - breaking unattended/CI runs. TerminateProcess ends the process
+// immediately, skips DLL detach so it cannot deadlock, and still sets the exit
+// code. Console output is already flushed (WriteConsoleW is synchronous).
+//
+// -1 is the documented pseudo-handle for the current process (the value
+// GetCurrentProcess() returns). It is passed directly so we avoid an
+// unreliable zero-argument external call and any x64 handle round-tripping.
 Procedure DFUnit_ConsoleExit Global Integer iOptExitCode
-    Integer iVoid
+    Integer iVoid iExitCode
+    Move 0 to iExitCode
     If (num_arguments > 0) ;
-        Move (DFUnit_WinAPI_ExitProcess(iOptExitCode)) to iVoid
-    Else
-        Move (DFUnit_WinAPI_ExitProcess(0)) to iVoid
+        Move iOptExitCode to iExitCode
+    Move (DFUnit_WinAPI_TerminateProcess(-1, iExitCode)) to iVoid
 End_Procedure
 
 { Visibility=Private }

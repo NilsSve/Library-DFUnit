@@ -1,4 +1,4 @@
-Use DFUnit\Testing\Assert.pkg
+﻿Use DFUnit\Testing\Assert.pkg
 Use DFUnit\Testing\AssertArray.pkg
 Use DFUnit\Testing\TestCollector.pkg
 Use DFUnit\Fixturing\FixtureCollector.pkg
@@ -19,12 +19,12 @@ Class cDFUnitFixture is a cObject
     End_Procedure
     
     Procedure End_Construct_Object 
-//        Integer iSelf iDesktop
-//        Move (Desktop) to iDesktop
-//        Move (Self) to iSelf
-//        If (ghoErrorHandler <> iSelf and (iDesktop <> iSelf)) Begin
+        Integer iSelf iDesktop
+        Move (Desktop) to iDesktop
+        Move (Self) to iSelf
+        If (ghoErrorHandler <> iSelf and (iDesktop <> iSelf) and (ghoTestApplication <> iSelf)) Begin
             Delegate Send DFUnitRegisterFixture Self
-//        End
+        End
     End_Procedure
     
     { Visibility=Private }
