@@ -152,6 +152,11 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
         Send Line
         Send PrintLn (SFormat("Assertions: %1/%2", TotalSucceededAssertions(hEnv), sTotalAssertions))
         Send PrintLn (SFormat("Tests: %1/%2", TotalSucceededTests(hEnv), TotalTests(hEnv)))
+        // Failures = assertion failures (test ran but assertion was wrong).
+        // Distinct from Errors below, which counts DataFlex runtime errors
+        // raised during a test (exception, missing file, etc.). Matches the
+        // XMLReporter's "failures" vs "errors" attributes (xUnit convention).
+        Send PrintLn (SFormat("Failures: %1", TotalFailedAssertions(hEnv)))
         Send PrintLn (SFormat("Errors: %1", TotalErrors(hEnv)))
         Send Line
         If (TestsSucceeded(hEnv)) Begin
