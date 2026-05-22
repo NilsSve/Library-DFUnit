@@ -70,10 +70,15 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
     
     Procedure Construct_Object
         Forward Send Construct_Object
-        
+
         { Visibility=Private }
         Property String[] paMessages
         Property Integer piLineNumber 1
+        // When True, Print emits no line-number prefix and does NOT advance the
+        // counter. Set during Finish so the summary block (Assertions / Tests /
+        // Failures / Errors and the trailing Tests: Succeeded!/Failure line)
+        // appears flush without a number, and the counter doesn't show gaps.
+        Property Boolean pbSuppressLineNumber False
     End_Procedure
     
     Procedure Start Handle hEnv
@@ -90,8 +95,14 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         Integer iIterator iMaxIndex iRow iPos
         String[] aMessages
         String sMessage
-        
+
+        // Suppress line-number prefixing for the whole summary block printed
+        // by the base-class Finish (Assertions / Tests / Failures / Errors
+        // and the trailing status line). Reset right after so any post-Finish
+        // output - none today, but future-proof - resumes normal numbering.
+        Set pbSuppressLineNumber to True
         Forward Send Finish hEnv
+        Set pbSuppressLineNumber to False
         Get paMessages to aMessages
         // Minus the last empty entry.
         Move (SizeOfArray(aMessages) - 1 - 1) to iMaxIndex
@@ -131,24 +142,31 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         String sIndentation sLineNumber
         String[] aMessages
         Integer iLineNumber
-        
-        Get piLineNumber to iLineNumber
-        Get PadStringWithZeroes iLineNumber to sLineNumber
-        Increment iLineNumber
-        Set piLineNumber to iLineNumber
-        
+        Boolean bSuppress
+
+        Get pbSuppressLineNumber to bSuppress
         Get ScopeIndentation to sIndentation
         Get paMessages to aMessages
-        
+
         If (pbNewLine(Self) = True) Begin
-            Move (sLineNumber + "  " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
-            // This removes the "at line number" comment, so don't use for now
-//            Move (String(SizeOfArray(aMessages)) + " " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
+            If (bSuppress = True) Begin
+                // Summary block - no line-number prefix, no counter advance.
+                Move (String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
+            End
+            Else Begin
+                Get piLineNumber to iLineNumber
+                Get PadStringWithZeroes iLineNumber to sLineNumber
+                Increment iLineNumber
+                Set piLineNumber to iLineNumber
+                Move (sLineNumber + "  " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
+                // This removes the "at line number" comment, so don't use for now
+//                Move (String(SizeOfArray(aMessages)) + " " + String(sIndentation) + sLine) to aMessages[SizeOfArray(aMessages) - 1]
+            End
         End
         Else Begin
             Move (aMessages[SizeOfArray(aMessages) - 1] + sLine) to aMessages[SizeOfArray(aMessages) - 1]
         End
-        
+
         Set paMessages to aMessages
         Set pbNewLine to False
     End_Procedure
