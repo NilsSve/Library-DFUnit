@@ -45,6 +45,11 @@ Class cDFUnitTestApplication is a cDFUnitFixture
 
         Property String psUnitTestTestingPackage
         Property String[] psUnitTestTestingPackageArray
+        // Optional name of an Include_Resource (type DF_RESOURCE_TYPE_LINE) holding the unit-test source.
+        // When set, ReadUnitTestsFile reads the source from the embedded resource instead of the on-disk
+        // file - so the failure line-number lookup works from the .exe alone (no source file shipped, e.g.
+        // a distributed/alpha package). Blank = read the on-disk psUnitTestTestingPackage (the old default).
+        Property String psUnitTestResource
     End_Procedure
     
 //    Procedure End_Construct_Object
@@ -194,9 +199,20 @@ Class cDFUnitTestApplication is a cDFUnitFixture
     // and returns it as a string array.
     Function ReadUnitTestsFile Returns Boolean
         String[] asSourceFile
-        String sPath sFileName
+        String sPath sFileName sResource
         Boolean bExists bRelative bQualified bOK
-        
+
+        // Prefer the embedded resource when the app provides one (Include_Resource ... type
+        // DF_RESOURCE_TYPE_LINE): it ships inside the .exe, so it is readable even when the source file
+        // is not distributed, and it matches the compiled binary exactly. Fall through to the on-disk
+        // file when no resource is configured, or if the resource read fails.
+        Get psUnitTestResource to sResource
+        If (sResource <> "") Begin
+            Get _ReadSourceFile ("resource: " + sResource) to bOK
+            If (bOK = True) ;
+                Function_Return True
+        End
+
         Get psUnitTestTestingPackage to sFileName
         Get IsFileNameQualified sFileName to bQualified
         // If the file name does not contain full path:
@@ -224,10 +240,11 @@ Class cDFUnitTestApplication is a cDFUnitFixture
 
         File_Exist sFileName bExists
         If (bExists = False) Begin
-            Send Info_Box ("Could not find the Unit testing source file:" * (String(sFileName)))
+            // Silent: the source-line lookup is a convenience. With no resource AND no on-disk source
+            // (e.g. a distributed binary), just disable it rather than popping a dialog on every launch.
             Function_Return False
-        End  
-        
+        End
+
         Get _ReadSourceFile sFileName to bOK
         
         Function_Return bOK
@@ -239,22 +256,32 @@ Class cDFUnitTestApplication is a cDFUnitFixture
     // If something went wrong FALSE will be returned.
     Function _ReadSourceFile String sFileName Returns Boolean
         Integer iCh iFileSize iCount
-        String[] asSourceFile   
-        String sLine sLineBreak
-        
+        String[] asSourceFile
+        String sLine sLineBreak sSpec
+        Boolean bResource
+
         Move 0 to iCount
         Get Seq_New_Channel to iCh
-        If (iCh = DF_SEQ_CHANNEL_NOT_AVAILABLE) Begin                 
+        If (iCh = DF_SEQ_CHANNEL_NOT_AVAILABLE) Begin
             Send Info_Box "No free channel available for input. (_ReadSourceFile function)."
             Function_Return False
         End
 
-        Get Win32APIFileSize sFilename to iFileSize
-        Move (ResizeArray(asSourceFile, iFileSize)) to asSourceFile
+        // A "resource:" spec is an embedded Include_Resource (DF_RESOURCE_TYPE_LINE) - open it as-is and
+        // read it line by line. A plain file name is opened in binary mode so CR+LF is the line delimiter
+        // (the filemode options don't seem to work as documented); its on-disk size pre-sizes the array,
+        // an optimization that does not apply to a resource.
+        Move (Lowercase(Left(sFileName, 9)) = "resource:") to bResource
+        If (bResource = False) Begin
+            Get Win32APIFileSize sFilename to iFileSize
+            Move (ResizeArray(asSourceFile, iFileSize)) to asSourceFile
+            Move ("binary:" + sFileName) to sSpec
+        End
+        Else Begin
+            Move sFileName to sSpec
+        End
 
-        // Need to use binary read mode as we want to use CR+LF as the line delimiter.
-        // The filemode options don't seem to work as documented, not sure why.
-        Direct_Input channel iCh ("binary:" + sFilename)
+        Direct_Input channel iCh sSpec
 
         While (SeqEof = False)
             Readln channel iCh sLine
