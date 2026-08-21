@@ -1,6 +1,14 @@
-[Properties]
-Version=26.0
-[WorkspacePaths]
-ConfigFile=.\Config.ws
-[Conditionals]
-Is$WebApp=False
+{
+    "description": "DFUnit - DataFlex unit testing framework: JUnit output and a console reporter for build servers.",
+    "df": 26.0,
+    "package": {
+        "df-min": 26.0,
+        "license": "MIT",
+        "licenseFile": "../LICENSE.txt",
+        "version": "0.1.0"
+    },
+    "paths": {
+        "configFile": "Config.ws"
+    },
+    "workspaceName": "DFUnit"
+}
