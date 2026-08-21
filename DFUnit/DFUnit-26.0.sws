@@ -4,7 +4,6 @@
     "package": {
         "df-min": 26.0,
         "license": "MIT",
-        "licenseFile": "../LICENSE.txt",
         "version": "0.1.0"
     },
     "paths": {
