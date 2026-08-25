@@ -1,0 +1,21 @@
+# Define the workspace as a DataFlex language project.
+# Once DataFlex lands in github-linguist (PR #7479) these mappings switch
+# from "suppress misdetection" to "count as DataFlex" automatically.
+# NOTE: deliberately no text/eol attributes here — this repo stores LF and
+# adding eol pins would renormalize every source file.
+*.src linguist-language=DataFlex
+*.pkg linguist-language=DataFlex
+*.vw linguist-language=DataFlex
+*.dg linguist-language=DataFlex
+*.sl linguist-language=DataFlex
+*.bp linguist-language=DataFlex
+*.wo linguist-language=DataFlex
+*.inc linguist-language=DataFlex
+*.rv linguist-language=DataFlex
+*.dd linguist-language=DataFlex
+*.h linguist-language=DataFlex
+*.Inc linguist-language=DataFlex
+
+# Workspace config is INI-format data — without this, *.ws is detected as
+# "Witcher Script" (a game-modding language) and dominates the stats.
+*.ws linguist-language=INI
