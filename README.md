@@ -27,8 +27,8 @@ you write should ever live there.
 > cannot rescue it, because uninstall configures the workspace first. Removing the
 > dependency and adding the package again is the clean route.
 
-**2. Copy in the scaffold.** The test program and the test files belong to *your*
-workspace, not to the package, so they have to be copied out of it and made writable.
+**2. Copy the Unit test program and helper files.** The test program and the test files belong to *your*
+workspace, so they have to be copied from the VDFQuery20 "package" and made writable.
 
 **The package puts the launcher where you can find it.** `SetupUnitTests.bat` and
 `SetupUnitTests.ps1` are in the manifest's `install` list, so installing the package drops
