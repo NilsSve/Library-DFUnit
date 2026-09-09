@@ -29,8 +29,10 @@ you write should ever live there.
 
 **2. Copy in the scaffold.** The test program and the test files belong to *your*
 workspace, not to the package, so they have to be copied out of it and made writable.
-Run `SetupUnitTests.bat` from the package folder, once, with the workspace folder as the
-working directory:
+Run `SetupUnitTests.bat` once - **double-clicking it in the package folder works**: a
+package checkout lives at `<workspace>\DfPkg\<name>\`, so it finds the workspace above
+itself and says which one it picked. It also pauses before closing, so you can read what
+it did. Or run it from the workspace folder:
 
 ```
 DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.bat -AddProject

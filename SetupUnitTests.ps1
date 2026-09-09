@@ -64,11 +64,30 @@ if (-not (Test-Path -LiteralPath $Workspace -PathType Container)) {
 }
 $Workspace = (Resolve-Path -LiteralPath $Workspace).Path
 
-# Guard against scaffolding into the package itself - which is what happens if this
-# script is double-clicked from Explorer, since the working directory is then the
-# package folder. The package is read-only and owned by the package manager.
-if ($Workspace.TrimEnd('\') -eq $PSScriptRoot.TrimEnd('\') -or
-    $Workspace.StartsWith($PSScriptRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
+function Test-InsidePackage([string] $path) {
+    $root = $PSScriptRoot.TrimEnd('\')
+    return ($path.TrimEnd('\') -eq $root -or
+            $path.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase))
+}
+
+# Double-clicked from Explorer, the working directory IS the package folder, so the
+# default would scaffold into the package - which is read-only and owned by the package
+# manager. But the workspace is knowable in that case: a package checkout lives at
+# <workspace>\DfPkg\<name>\, so two levels up is the workspace. Use it if it looks like
+# one, and only complain when it does not (a package resolved into the machine-wide cache
+# has no workspace above it).
+if ((-not $PSBoundParameters.ContainsKey('Workspace')) -and (Test-InsidePackage $Workspace)) {
+    $guess = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+    if ($guess -and (Test-Path -LiteralPath $guess -PathType Container) -and
+        (Get-ChildItem -LiteralPath $guess -Filter '*.sws' -File -ErrorAction SilentlyContinue)) {
+        $Workspace = (Resolve-Path -LiteralPath $guess).Path
+        Write-Host ""
+        Write-Host "Run from inside the package, so using the workspace above it:" -ForegroundColor Yellow
+        Write-Host "  $Workspace"
+    }
+}
+
+if (Test-InsidePackage $Workspace) {
     Fail ("That is the DFUnit package folder, not a workspace:`n  $Workspace`n" +
           "Run this from your own workspace folder, or pass -Workspace <folder>.")
 }
