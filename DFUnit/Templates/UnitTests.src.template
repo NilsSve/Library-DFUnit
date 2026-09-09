@@ -1,8 +1,13 @@
 ﻿// UnitTests.src - the unit-test program for this workspace.
 //
-// Created from the DFUnit package template (SetupUnitTests.ps1). Add it to the
-// workspace's project list - in the Studio: right-click the workspace in the
-// Solution Explorer > Add > Add Project - and compile it like any other program.
+// Copied here from the DFUnit package by SetupUnitTests.bat. It has to live in your
+// OWN AppSrc: DataFlex resolves a project name against the workspace's own AppSrc
+// path only, never against a library's, so a copy inside the package could not be
+// added as a project at all.
+//
+// Add it to the workspace's project list - in the Studio: right-click the workspace
+// in the Solution Explorer > Add > Add Project - and compile it like any other
+// program.
 //
 // Running it:
 //     UnitTests64.exe                  the test-runner window

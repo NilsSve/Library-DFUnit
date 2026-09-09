@@ -23,7 +23,7 @@ workspace, not to the package, so they have to be copied out of it and made writ
 Run this once from the workspace folder:
 
 ```
-DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.cmd -AddProject
+DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.bat -AddProject
 ```
 
 or, if you would rather not type the checkout's SHA:
@@ -42,11 +42,12 @@ list (drop `-AddProject` to add the project yourself in the Studio):
 | `AppSrc\oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
 | `AppSrc\oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
 
-> **Do not add anything from the package's `DFUnit\Templates` folder as a project.**
-> Those files carry a `.template` suffix and are not on any AppSrc search path, so the
-> Studio has nothing to compile and reports no error at all - it simply does nothing.
-> `df-cli` is more forthcoming: *"Project ... could not be found in any AppSrc paths"*.
-> Step 2 exists precisely to get writable copies into your own `AppSrc`.
+> **A project's `.src` must live in the workspace's OWN `AppSrc`** - DataFlex resolves a
+> project name against that path only, never against a library's. So nothing inside the
+> package can be added as a project, which is why step 2 exists and why the templates
+> carry a `.template` suffix. Add one anyway and the Studio reports no error at all: it
+> simply does nothing. `df-cli` is more forthcoming -
+> *"Project ... could not be found in any AppSrc paths"*.
 
 Compile `UnitTests` and run it. The runner window opens and the example tests pass. From
 then on, adding tests is: copy `oExample-Tests.pkg` to `o<Subject>-Tests.pkg`, write the
@@ -58,7 +59,7 @@ writes JUnit XML and exits 0 when everything passed, -1 when something failed.
 ### Getting Started (DataFlex 20 - 25)
 
 
-The repository is self-sustaining aside from the DataFlex APIs. To use this renewed version you will need DataFlex 20.0+. By simply opening the Sample workspace and compiling it you should be able to automatically see the output of the unit tests.
+The repository is self-sustaining aside from the DataFlex APIs, and works from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - as a library entry pointing at the `DFUnit\DFUnit-<version>.sws` for your release - and write the test program yourself. The four files under `DFUnit\Templates` are exactly what you need; copy them into your workspace's `AppSrc` and drop the `.template` suffix.
 
 Now let's walk through the essentials:
 
@@ -69,7 +70,7 @@ Should you wish to create a new project that is build-server compatible perform 
 1. Disable the following project options in the studio<sup>1:</sup>
     - Build Manifest
     - Embed Manifest
-2. Disable suffixes on 64-bit to make it easier for the compiler; **for the current Jenkinsfile example**.
+2. Disable suffixes on 64-bit if your build script expects an unsuffixed executable name.
 
 <sup>1</sup>Is needed as studio settings might interfere with the console compiler's settings from the workspace.
 

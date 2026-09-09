@@ -1,13 +1,16 @@
 # Do not compile anything in this folder
 
-These files carry a `.template` suffix on purpose. They are **not** part of the DFUnit
-library and they are **not** on any AppSrc search path, so adding one as a project does
-nothing at all — the Studio simply has nothing to compile and reports no error.
+These files carry a `.template` suffix on purpose.
+
+DataFlex resolves a project name against the **workspace's own** `AppSrc` path only, never
+against a library's — so no file inside this package can be added as a project, wherever in
+the package it sits. Add one anyway and the Studio reports no error at all: it simply does
+nothing. (`df-cli` at least says *"Project ... could not be found in any AppSrc paths"*.)
 
 They are the starter files your **own** workspace owns. Copy them out first:
 
 ```
-SetupUnitTests.cmd
+SetupUnitTests.bat
 ```
 
 in the package folder — or, from your workspace folder:

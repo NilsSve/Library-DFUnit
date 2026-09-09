@@ -1,9 +1,9 @@
 ; UnitTests.cfg - project settings for the DFUnit test program.
 ;
-; Manifest generation is off on purpose: the DFUnit README asks for it, because
-; the Studio's manifest settings otherwise interfere with a console compile on a
-; build server. Platform=x64 makes a command-line build produce UnitTests64.exe
-; rather than silently falling back to 32-bit.
+; Manifest generation is off on purpose: the DFUnit README asks for it, because the
+; Studio's manifest settings otherwise interfere with a console compile on a build
+; server. Platform=x64 makes a command-line build produce UnitTests64.exe rather than
+; silently falling back to 32-bit.
 [Application]
 IsWebApp=0
 BuildManifestFile=0

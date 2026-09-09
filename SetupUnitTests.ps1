@@ -5,13 +5,16 @@
 .DESCRIPTION
     DFUnit installs as a DataFlex 26 package, which means its files live under the
     consuming workspace's DfPkg folder and are read-only - the package manager owns
-    them and overwrites them on every update. The test PROGRAM and the test FILES,
-    though, belong to your workspace and have to be writable.
+    them and overwrites them on every update.
 
-    This script copies the three starter files out of the package and clears the
-    read-only attribute they inherit from it:
+    The test program and the test files, though, belong to your workspace and have to
+    be writable - and the program in particular MUST live in your own AppSrc, because
+    DataFlex resolves a project name against the workspace's own AppSrc path only,
+    never against a library's. So this script copies all four out of the package and
+    clears the read-only attribute they inherit from it:
 
         UnitTests.src       the test program - add it to the workspace's projects
+        UnitTests.cfg       its project settings: 64-bit, manifests off
         oUnit_Tests.pkg     the root fixture - one Use line per test file
         oExample-Tests.pkg  a worked example to copy for your own tests
 
@@ -170,7 +173,9 @@ if ($AddProject) {
                 $body = $m.Groups[2].Value
                 if ($body.Trim().Length -eq 0) {
                     # Empty array.
-                    return $m.Groups[1].Value + "`n        `"UnitTests.src`"" + $m.Groups[3].Value
+                    # An empty array has no existing entry to copy indentation from,
+                    # and no newline before its bracket either - supply both.
+                    return $m.Groups[1].Value + "`n        `"UnitTests.src`"`n    " + $m.Groups[3].Value.TrimStart("`r", "`n", " ", "`t")
                 }
                 # Reuse the indentation of the last existing entry.
                 $indent = '        '
