@@ -27,16 +27,8 @@ you write should ever live there.
 > cannot rescue it, because uninstall configures the workspace first. Removing the
 > dependency and adding the package again is the clean route.
 
-**2. Copy the Unit test program and helper files.** The test program and the test files belong to *your*
-workspace, so they have to be copied from the VDFQuery20 "package" and made writable.
-
-**The package puts the launcher where you can find it.** `SetupUnitTests.bat` and
-`SetupUnitTests.ps1` are in the manifest's `install` list, so installing the package drops
-a copy of both into your own workspace folder, beside the `.sws`. Double-click the `.bat`
-there and it does the rest - it locates the package itself, and pauses before closing so
-you can read what it did. (The copies may or may not carry the
-read-only attribute - measured both ways, apparently depending on whether the package was
-freshly fetched or served from the machine cache. Either way it does not stop them running.)
+**2. Double-click `SetupUnitTests.bat` in your workspace Home folder.** The test program belongs to *your*
+workspace's AppSrc folder, so a few files from the VDFQuery20 "package" need to be copied and made writable.
 
 ```
 SetupUnitTests.bat -AddProject
