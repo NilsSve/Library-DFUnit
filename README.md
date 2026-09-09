@@ -109,16 +109,18 @@ at the source - which is exactly what the folder prevents.
 
 The framework code itself is self-sustaining aside from the DataFlex APIs and still compiles from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - a library entry pointing at a workspace file for your release - and set the test program up by hand: copy the four files from `Templates` into your workspace's `AppSrc` and drop the `.template` suffix.
 
-**Only `DFUnit-26.0.sws` ships now.** The INI workspace files for 20.0 - 25.0 were removed; a DataFlex 25 Studio cannot read the JSON one. Write your own - it needs only four lines -
+**Two workspace files ship: `DFUnit-26.0.sws` and `DFUnit-25.0.sws`.** A DataFlex 25 Studio cannot read the JSON one, so the INI file for 25.0 is kept alongside it; point your library entry at `DFUnit-25.0.sws`. The ones for 20.0 - 24.0 were removed. If you need one, they are six lines and the 25.0 file is the template - only `Version=` changes:
 
 ```ini
 [Properties]
-Version=25.0
+Version=24.0
 [WorkspacePaths]
 ConfigFile=.\Config.ws
+[Conditionals]
+Is$WebApp=False
 ```
 
-or recover the original with `git show a2e8850:DFUnit/DFUnit-25.0.sws`.
+or recover an original with `git show a2e8850:DFUnit/DFUnit-24.0.sws`.
 
 Now let's walk through the essentials:
 
