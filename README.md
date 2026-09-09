@@ -18,7 +18,7 @@ The package lands under the workspace's `DfPkg` folder. Those files are **read-o
 design** - the package manager owns them and replaces them on every update, so nothing
 you write should ever live there.
 
-> **Moving an existing pin forward?** The repository was flattened - everything that used
+> **The repository was adjusted to not generate any compile warnings**  The folder structure was simplified - everything that used
 > to sit under `DFUnit/` is now at the root. A git dependency records **two coupled
 > fields**, the commit and the manifest's path *inside the repo at that commit*, so
 > `"sws": "DFUnit/DFUnit-26.0.sws"` has to become `"sws": "DFUnit-26.0.sws"` in the same
@@ -27,20 +27,9 @@ you write should ever live there.
 > cannot rescue it, because uninstall configures the workspace first. Removing the
 > dependency and adding the package again is the clean route.
 
-**2. Double-click `SetupUnitTests.bat` in your workspace Home folder.** The test program belongs to *your*
-workspace's AppSrc folder, so a few files from the VDFQuery20 "package" need to be copied and made writable.
-
 ```
 SetupUnitTests.bat -AddProject
 ```
-
-The same script works from anywhere: run it from inside the package folder and it finds
-the workspace above it (a checkout lives at `<workspace>\DfPkg\<name>\`); run it from a
-workspace and it finds the package under `DfPkg\` or, failing that, in the machine-wide
-cache at `%ProgramData%\DataFlex\Packages\Cache\`. The workspace's own `DfPkg` always wins,
-even when a cached copy is newer - that one may belong to a different workspace on a
-different version. Whichever it picks, it says so before
-copying anything.
 
 > A dependency added as a **local path** rather than a package gets none of this -
 > *"Library ... is a local library and therefore its install files are ignored."* Run the
