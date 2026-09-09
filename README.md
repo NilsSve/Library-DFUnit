@@ -34,8 +34,9 @@ workspace, not to the package, so they have to be copied out of it and made writ
 `SetupUnitTests.ps1` are in the manifest's `install` list, so installing the package drops
 a copy of both into your own workspace folder, beside the `.sws`. Double-click the `.bat`
 there and it does the rest - it locates the package itself, and pauses before closing so
-you can read what it did. (`install` clears the read-only attribute on the way out, so the
-copies in your workspace are writable even though the originals in the package are not.)
+you can read what it did. (The copies may or may not carry the
+read-only attribute - measured both ways, apparently depending on whether the package was
+freshly fetched or served from the machine cache. Either way it does not stop them running.)
 
 ```
 SetupUnitTests.bat -AddProject
