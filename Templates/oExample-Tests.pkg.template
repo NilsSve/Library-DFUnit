@@ -16,9 +16,9 @@
 //     Send AssertDAreEqual   dExpected  dActual    sMessage
 //     Send AssertStrArrAreEqual asExpected asActual sMessage
 // ...plus the AreNotEqual twin of each, the BigInt/DateTime/TimeSpan variants,
-// and the array forms in DFUnit\Testing\AssertArray.pkg.
+// and the array forms in Testing\AssertArray.pkg.
 
-Use DFUnit\Fixturing\Fixture.pkg
+Use Fixturing\Fixture.pkg
 
 Object oExample_Tests is a cTestFixture
     Set psTestFixtureName to "Example"

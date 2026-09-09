@@ -1,12 +1,12 @@
 Use VDFBase.pkg
 
-Use DFUnit\Testing\Test.pkg
-Use DFUnit\Fixturing\Fixture.pkg
-Use DFUnit\Reporting\ReporterManager.pkg
-Use DFUnit\Results\StatisticsCollector.pkg
+Use Testing\Test.pkg
+Use Fixturing\Fixture.pkg
+Use Reporting\ReporterManager.pkg
+Use Results\StatisticsCollector.pkg
 
-Use DFUnit\Utils\Debugger.pkg
-Use DFUnit\Utils\ErrorTracker.pkg
+Use Utils\Debugger.pkg
+Use Utils\ErrorTracker.pkg
 
 #IFNDEF C_NewLine
 Define C_NewLine for (Character(13) + Character(10))

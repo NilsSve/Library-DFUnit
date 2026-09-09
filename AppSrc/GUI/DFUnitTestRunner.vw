@@ -1,6 +1,6 @@
 Use DFClient.pkg
-Use DFUnit\Reporting\ReporterManager.pkg
-Use DFUnit\Reporting\Reporters\UIListReporter.pkg
+Use Reporting\ReporterManager.pkg
+Use Reporting\Reporters\UIListReporter.pkg
 
 { Visibility=Private }
 Define DFUNIT_UI_WINDOW_HEIGHT for 630 //255

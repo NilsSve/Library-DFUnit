@@ -1,5 +1,5 @@
 Use seq_chnl.pkg
-Use DFUNit\Results\ResultCollector.pkg
+Use Results\ResultCollector.pkg
 
 Define XML_NEWLINE_REPLACE for "&#10;"
 

@@ -1,5 +1,5 @@
 Use VDFBase.pkg
-Use DFUnit\Utils\ErrorSystem.pkg
+Use Utils\ErrorSystem.pkg
 
 Define DFERR_DFUNIT_NON_IMPLEMENTED for "Unimplemented interface function."
 

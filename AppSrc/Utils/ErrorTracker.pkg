@@ -1,9 +1,9 @@
 Use VdfBase.pkg
 
-Use DFUnit\Globals.pkg
+Use Globals.pkg
 
-Use DFUnit\Utils\ErrorSystem.pkg
-Use DFUnit\Utils\Debugger.pkg
+Use Utils\ErrorSystem.pkg
+Use Utils\Debugger.pkg
 
 Class cDFUnitErrorTracker is a cObject
     

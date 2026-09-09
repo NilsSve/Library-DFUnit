@@ -1,5 +1,5 @@
 Use WinKern.pkg
-Use DFUnit\Utils\ErrorTracker.pkg
+Use Utils\ErrorTracker.pkg
 
 {Visibility=Private}
 Procedure DFUnit_ThrowErrorNormalIfDebugger Global Integer iErrNum String sMessage

@@ -3,7 +3,7 @@ Use cRichEdit.pkg
     Define clEditorBackGround for (RGB(36, 49, 68)) // HTML 243144
 #ENDIF
 
-Use DFUnit\Reporting\LineBasedReporting.pkg
+Use Reporting\LineBasedReporting.pkg
 
 Class cDFUnitUIListInmediateReporter is a cRichEdit
         

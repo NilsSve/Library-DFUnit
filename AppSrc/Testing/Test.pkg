@@ -1,8 +1,8 @@
-﻿Use DFUnit\Globals.pkg
-Use DFUnit\Testing\Assert.pkg
-Use DFUnit\Testing\AssertArray.pkg
+﻿Use Globals.pkg
+Use Testing\Assert.pkg
+Use Testing\AssertArray.pkg
 
-Use DFUnit\Utils\Objects.pkg
+Use Utils\Objects.pkg
 
 Class cDFUnitTest is a cObject
     Import_Class_Protocol cDFUnitAssert_Mixin

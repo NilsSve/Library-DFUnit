@@ -71,6 +71,17 @@ then on, adding tests is: copy `oExample-Tests.pkg` to `o<Subject>-Tests.pkg`, w
 For a build server, run it unattended - `Programs\UnitTests64.exe -c -o test_results.xml`
 writes JUnit XML and exits 0 when everything passed, -1 when something failed.
 
+### A note on package names
+
+DFUnit's sources sit directly in its `AppSrc`, and a library's `AppSrc` joins the
+consuming workspace's include search path. So `Application.pkg`, `Globals.pkg`,
+`Version.pkg`, `Utils.pkg`, `Testing.pkg`, `Reporting.pkg`, `Fixturing.pkg`, `GUI.pkg`,
+`CallRecording.pkg` and `EnableCallRecording.pkg` are names your workspace should not also
+use for a file of its own. None of them clash with anything the DataFlex installation
+ships. If your workspace already has one, rename yours - a same-basename clash across the
+search path is resolved by an order the workspace file cannot steer, so it has to be
+removed at the source.
+
 ### Getting Started (DataFlex 20 - 25)
 
 

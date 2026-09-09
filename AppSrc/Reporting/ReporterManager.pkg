@@ -1,4 +1,4 @@
-﻿Use DFUnit\Reporting\ReporterInterface.pkg
+﻿Use Reporting\ReporterInterface.pkg
 
 Class cDFUnitReporterManager_Mixin is a Mixin
     

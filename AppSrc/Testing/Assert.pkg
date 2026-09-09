@@ -1,10 +1,10 @@
 Use VdfBase.pkg
 Use Winkern.pkg
 
-Use DFUnit\Globals.pkg
-Use DFUnit\Utils\Debugger.pkg
-Use DFUnit\Utils\Objects.pkg
-Use DFUnit\CallRecording.pkg
+Use Globals.pkg
+Use Utils\Debugger.pkg
+Use Utils\Objects.pkg
+Use CallRecording.pkg
 
 Class cDFUnitAssert_Mixin is a Mixin
     

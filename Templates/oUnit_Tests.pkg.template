@@ -7,7 +7,7 @@
 // Setup and TearDown here run around every test in every nested fixture, so this
 // is where state that must be reset between tests belongs.
 
-Use DFUnit\Fixturing\Fixture.pkg
+Use Fixturing\Fixture.pkg
 
 Object oWorkspace_Tests is a cTestFixture
     Set psTestFixtureName to "Workspace tests"

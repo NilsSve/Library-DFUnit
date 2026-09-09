@@ -2,16 +2,16 @@
 Use Data_Set.pkg
 Use seq_chnl.pkg
 
-// Note; Needs to be defined before the "DFUnit\" Use statements below.
+// Note; Needs to be defined before the DFUnit Use statements below.
 Define CS_FailedClause for "[Failed!]" 
 
-Use DFUnit\Version.pkg
-Use DFUnit\GUI.pkg
-Use DFUnit\Utils.pkg
-Use DFUnit\Testing.pkg
-Use DFUnit\Fixturing.pkg
-Use DFUnit\Reporting.pkg
-Use DFUnit\Results\StatisticsCollector.pkg
+Use Version.pkg
+Use GUI.pkg
+Use Utils.pkg
+Use Testing.pkg
+Use Fixturing.pkg
+Use Reporting.pkg
+Use Results\StatisticsCollector.pkg
 
 Class cDFUnitTestApplication is a cDFUnitFixture
     

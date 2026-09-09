@@ -1,11 +1,11 @@
 Use VdfBase.pkg
 Use gFormatNumbers.pkg
 
-Use DFUnit\Testing\Test.pkg
-Use DFUnit\Testing\TestRunner.pkg
-Use DFUnit\Fixturing\Fixture.pkg
-Use DFUnit\Results\StatisticsCollector.pkg
-Use DFUnit\Reporting\ReporterInterface.pkg
+Use Testing\Test.pkg
+Use Testing\TestRunner.pkg
+Use Fixturing\Fixture.pkg
+Use Results\StatisticsCollector.pkg
+Use Reporting\ReporterInterface.pkg
 
 Use RGB.pkg
 #IFNDEF clEditorBackGround

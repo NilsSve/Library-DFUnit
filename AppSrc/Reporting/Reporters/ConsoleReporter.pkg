@@ -1,6 +1,6 @@
-Use DFUnit\Reporting\LineBasedReporting.pkg
+Use Reporting\LineBasedReporting.pkg
 
-Use DFUnit\Utils\Console.pkg
+Use Utils\Console.pkg
 
 Class cDFUnitConsoleReporter is a IReporter_Mixin
     
