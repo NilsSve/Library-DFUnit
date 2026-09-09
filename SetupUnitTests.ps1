@@ -82,7 +82,7 @@ if (-not (Get-ChildItem -LiteralPath $Workspace -Filter '*.sws' -File)) {
 }
 
 # ---------------------------------------------------------------- the templates
-$templates = Join-Path $PSScriptRoot 'DFUnit\Templates'
+$templates = Join-Path $PSScriptRoot 'Templates'
 if (-not (Test-Path -LiteralPath $templates -PathType Container)) {
     Fail "Template folder not found: $templates`nRun this script from the DFUnit package folder, not a copy of it."
 }

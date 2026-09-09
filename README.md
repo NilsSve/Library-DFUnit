@@ -18,6 +18,15 @@ The package lands under the workspace's `DfPkg` folder. Those files are **read-o
 design** - the package manager owns them and replaces them on every update, so nothing
 you write should ever live there.
 
+> **Moving an existing pin forward?** The repository was flattened - everything that used
+> to sit under `DFUnit/` is now at the root. A git dependency records **two coupled
+> fields**, the commit and the manifest's path *inside the repo at that commit*, so
+> `"sws": "DFUnit/DFUnit-26.0.sws"` has to become `"sws": "DFUnit-26.0.sws"` in the same
+> edit that moves `"version"` forward. Change one without the other and df-cli reports
+> *Failed to configure* and leaves the workspace **BROKEN** - and `package uninstall`
+> cannot rescue it, because uninstall configures the workspace first. Removing the
+> dependency and adding the package again is the clean route.
+
 **2. Copy in the scaffold.** The test program and the test files belong to *your*
 workspace, not to the package, so they have to be copied out of it and made writable.
 Run `SetupUnitTests.bat` from the package folder, once, with the workspace folder as the
@@ -65,7 +74,18 @@ writes JUnit XML and exits 0 when everything passed, -1 when something failed.
 ### Getting Started (DataFlex 20 - 25)
 
 
-The repository is self-sustaining aside from the DataFlex APIs, and works from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - as a library entry pointing at the `DFUnit\DFUnit-<version>.sws` for your release - and write the test program yourself. The four files under `DFUnit\Templates` are exactly what you need; copy them into your workspace's `AppSrc` and drop the `.template` suffix.
+The framework code itself is self-sustaining aside from the DataFlex APIs and still compiles from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - a library entry pointing at a workspace file for your release - and set the test program up by hand: copy the four files from `Templates` into your workspace's `AppSrc` and drop the `.template` suffix.
+
+**Only `DFUnit-26.0.sws` ships now.** The INI workspace files for 20.0 - 25.0 were removed; a DataFlex 25 Studio cannot read the JSON one. Write your own - it needs only four lines -
+
+```ini
+[Properties]
+Version=25.0
+[WorkspacePaths]
+ConfigFile=.\Config.ws
+```
+
+or recover the original with `git show a2e8850:DFUnit/DFUnit-25.0.sws`.
 
 Now let's walk through the essentials:
 
