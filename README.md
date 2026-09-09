@@ -7,7 +7,7 @@
 From DataFlex 26 the quickest route is to add DFUnit as a package and copy in the
 starter files. Two steps, and nothing in this repository has to be edited:
 
-**1. Add the package.** In the Studio: right-click the workspace > Add > Add Package,
+**1. Add the package.** In the Studio: select the package-manager > Add Package,
 or from a command prompt in the workspace folder:
 
 ```
