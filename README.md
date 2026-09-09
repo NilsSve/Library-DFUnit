@@ -71,16 +71,31 @@ then on, adding tests is: copy `oExample-Tests.pkg` to `o<Subject>-Tests.pkg`, w
 For a build server, run it unattended - `Programs\UnitTests64.exe -c -o test_results.xml`
 writes JUnit XML and exits 0 when everything passed, -1 when something failed.
 
-### A note on package names
+### Why the sources live in a `DFUnit` folder
 
-DFUnit's sources sit directly in its `AppSrc`, and a library's `AppSrc` joins the
-consuming workspace's include search path. So `Application.pkg`, `Globals.pkg`,
-`Version.pkg`, `Utils.pkg`, `Testing.pkg`, `Reporting.pkg`, `Fixturing.pkg`, `GUI.pkg`,
-`CallRecording.pkg` and `EnableCallRecording.pkg` are names your workspace should not also
-use for a file of its own. None of them clash with anything the DataFlex installation
-ships. If your workspace already has one, rename yours - a same-basename clash across the
-search path is resolved by an order the workspace file cannot steer, so it has to be
-removed at the source.
+The layout is deliberate, and worth leaving alone.
+
+A library's AppSrc path joins the consuming workspace's include search path. DFUnit's
+AppSrc path is the **package root**, and the framework sits one level below it in `DFUnit`,
+so every internal include is written `Use DFUnit\Testing\Assert.pkg` and the only bare name
+the library contributes to your workspace is `DFUnit.pkg` - the one you actually call.
+
+Put those files directly on the search path instead and they stop being namespaced. Names
+like `Globals.pkg`, `Application.pkg`, `Version.pkg` and `Utils.pkg` are ordinary things for
+a DataFlex application to have, and the consequence is not a warning - it is a workspace
+that will not build, with every error pointing inside DFUnit:
+
+```
+While compiling ErrorSystem.pkg:
+    (119,1) Error 4328: Undefined symbol in argument GHOERRORTRACKER
+While compiling Assert.pkg:
+    (13,1) Error 4328: Undefined symbol in argument GHOTESTAPPLICATION
+```
+
+That is a real run against a workspace whose only crime was having its own `Globals.pkg`:
+it shadowed DFUnit's, so the globals were never defined. A same-basename clash across the
+search path resolves by an order the workspace file cannot steer, so it can only be fixed
+at the source - which is exactly what the folder prevents.
 
 ### Getting Started (DataFlex 20 - 25)
 

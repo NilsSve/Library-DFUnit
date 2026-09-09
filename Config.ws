@@ -1,6 +1,6 @@
 [Workspace]
 Home=.\
-AppSrcPath=.\AppSrc
+AppSrcPath=.\
 AppHTMLPath=.\
 BitmapPath=.\Bitmaps
 IdeSrcPath=.\IdeSrc
