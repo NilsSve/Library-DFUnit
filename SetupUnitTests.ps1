@@ -88,12 +88,20 @@ if (Test-IsPackage $PSScriptRoot) {
     $pkgRoot = $PSScriptRoot
 }
 else {
+    # In strict order. The workspace's own DfPkg is authoritative - it holds the version
+    # THIS workspace is pinned to - so it must win even when a copy in the machine-wide
+    # cache is newer, which it can easily be: another workspace on the same machine may
+    # have pulled a later version, and the two folders are written seconds apart even for
+    # the same commit. Only fall back to the cache when the workspace has no checkout.
     $searchIn = @((Join-Path $Workspace 'DfPkg'),
                   (Join-Path $env:ProgramData 'DataFlex\Packages\Cache'))
-    $pkgRoot = Get-ChildItem -LiteralPath $searchIn -Directory -Filter '*DFUnit*' -ErrorAction SilentlyContinue |
-               Sort-Object LastWriteTime -Descending |
-               Where-Object { Test-IsPackage $_.FullName } |
-               Select-Object -First 1 -ExpandProperty FullName
+    foreach ($where in $searchIn) {
+        $pkgRoot = Get-ChildItem -LiteralPath $where -Directory -Filter '*DFUnit*' -ErrorAction SilentlyContinue |
+                   Sort-Object LastWriteTime -Descending |
+                   Where-Object { Test-IsPackage $_.FullName } |
+                   Select-Object -First 1 -ExpandProperty FullName
+        if ($pkgRoot) { break }
+    }
     if ($pkgRoot) {
         Write-Host ""
         Write-Host "Using the DFUnit package at:" -ForegroundColor Yellow

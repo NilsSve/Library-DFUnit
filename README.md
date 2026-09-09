@@ -34,8 +34,8 @@ workspace, not to the package, so they have to be copied out of it and made writ
 `SetupUnitTests.ps1` are in the manifest's `install` list, so installing the package drops
 a copy of both into your own workspace folder, beside the `.sws`. Double-click the `.bat`
 there and it does the rest - it locates the package itself, and pauses before closing so
-you can read what it did. They arrive read-only, because the package manager owns them;
-that does not stop them running.
+you can read what it did. (`install` clears the read-only attribute on the way out, so the
+copies in your workspace are writable even though the originals in the package are not.)
 
 ```
 SetupUnitTests.bat -AddProject
@@ -44,7 +44,9 @@ SetupUnitTests.bat -AddProject
 The same script works from anywhere: run it from inside the package folder and it finds
 the workspace above it (a checkout lives at `<workspace>\DfPkg\<name>\`); run it from a
 workspace and it finds the package under `DfPkg\` or, failing that, in the machine-wide
-cache at `%ProgramData%\DataFlex\Packages\Cache\`. Whichever it picks, it says so before
+cache at `%ProgramData%\DataFlex\Packages\Cache\`. The workspace's own `DfPkg` always wins,
+even when a cached copy is newer - that one may belong to a different workspace on a
+different version. Whichever it picks, it says so before
 copying anything.
 
 > A dependency added as a **local path** rather than a package gets none of this -
