@@ -1,5 +1,4 @@
 Use DFClient.pkg
-Use cUnitCommandBar.pkg
 Use DFUnit\Reporting\ReporterManager.pkg
 Use DFUnit\Reporting\Reporters\UIListReporter.pkg
 

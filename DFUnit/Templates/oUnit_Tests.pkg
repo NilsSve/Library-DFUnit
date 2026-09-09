@@ -1,0 +1,24 @@
+﻿// oUnit_Tests.pkg - the root fixture for this workspace's unit tests.
+//
+// This is the ONLY file you edit when you add a new test file: one Use line per
+// subject. Keep one file per class or per function under test, named
+// o<Subject>-Tests.pkg by convention.
+//
+// Setup and TearDown here run around every test in every nested fixture, so this
+// is where state that must be reset between tests belongs.
+
+Use DFUnit\Fixturing\Fixture.pkg
+
+Object oWorkspace_Tests is a cTestFixture
+    Set psTestFixtureName to "Workspace tests"
+
+    Procedure Setup
+    End_Procedure
+
+    Procedure TearDown
+    End_Procedure
+
+    // *** Test files below - one Use line per subject: ***
+    Use oExample-Tests.pkg
+
+End_Object

@@ -23,3 +23,7 @@ Object oTestApplication is a cDFUnitTestApplication
         Send UnExpectError DFERR_PROGRAM
     End_Procedure
 End_Object
+
+// Parses the command line, then either shows the test-runner window or runs the
+// tests on the console and exits 0 (all passed) / -1 (a test failed).
+Send AutoRun of ghoTestApplication

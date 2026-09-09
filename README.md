@@ -2,7 +2,48 @@
 
 **DFUnit** is a renewed DataFlex testing framework. It was originally forked from [https://github.com/olaeld/DFUnit](https://github.com/olaeld/DFUnit). Data Access originally forked it to accommodate the framework for multiple reporters like seen in frameworks like doctest. Most importantly support for build-servers was added using a new Console reporter and exit codes. It supports outputting to one of the most used test-data formats **JUnit** which will help for a steady CI flow. The framework is and will stay free.
 
-### Getting Started
+### Getting Started (DataFlex 26+: add it as a package)
+
+From DataFlex 26 the quickest route is to add DFUnit as a package and copy in the
+starter files. Two steps, and nothing in this repository has to be edited:
+
+**1. Add the package.** In the Studio: right-click the workspace > Add > Add Package,
+or from a command prompt in the workspace folder:
+
+```
+df-cli package install <YourWorkspace>.sws https://github.com/NilsSve/Library-DFUnit.git
+```
+
+The package lands under the workspace's `DfPkg` folder. Those files are **read-only by
+design** - the package manager owns them and replaces them on every update, so nothing
+you write should ever live there.
+
+**2. Copy in the scaffold.** The test program and the test files belong to *your*
+workspace, so they get copied out of the package and made writable. Run this once from
+the workspace folder:
+
+```
+powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUnit*\SetupUnitTests.ps1)[0] -AddProject
+```
+
+That drops three files into `AppSrc` and adds `UnitTests.src` to the workspace's project
+list (drop `-AddProject` to add the project yourself in the Studio):
+
+| File | What it is |
+|---|---|
+| `UnitTests.src` | The test program. Compile and run it; you should not need to edit it again. |
+| `oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
+| `oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
+
+Compile `UnitTests` and run it. The runner window opens and the example tests pass. From
+then on, adding tests is: copy `oExample-Tests.pkg` to `o<Subject>-Tests.pkg`, write the
+`{ Published=True }` procedures, add one `Use` line in `oUnit_Tests.pkg`.
+
+For a build server, run it unattended - `Programs\UnitTests64.exe -c -o test_results.xml`
+writes JUnit XML and exits 0 when everything passed, -1 when something failed.
+
+### Getting Started (DataFlex 20 - 25)
+
 
 The repository is self-sustaining aside from the DataFlex APIs. To use this renewed version you will need DataFlex 20.0+. By simply opening the Sample workspace and compiling it you should be able to automatically see the output of the unit tests.
 
@@ -48,7 +89,15 @@ Object oTestApplication is a cDFUnitTestApplication
         Send Assert True "True should be True."
     End_Procedure
 End_Object
+
+// Parses the command line, then either shows the test-runner window or runs the
+// tests on the console and exits 0 (all passed) / -1 (a test failed).
+Send AutoRun of ghoTestApplication
 ```
+
+3. Call `AutoRun` once, at the bottom of the `.src`. It arbitrates the command line
+   (see **Console options** below) and then either opens the test-runner window or
+   runs the tests on the console and exits with the appropriate code.
 
 #### Using fixtures
 
@@ -109,6 +158,11 @@ End_Procedure
 `pbUseUIIfInDebugger`, Should `pbUseUI` be false this could override that property if using the debugger.
 
 `pbUseUI`, Indicates whether the UI or Console should run by default.
+
+`pbUseBuiltInUI`, Whether `AutoRun` may open the framework's own test-runner window.
+Leave it True unless your program builds a runner window of its own - and even then you
+normally need not touch it: `AutoRun` skips the built-in window automatically whenever
+the program already has a main panel, so a host with its own view keeps full control.
 
 ### Console options
 

@@ -42,6 +42,10 @@ Class cDFUnitTestApplication is a cDFUnitFixture
         Property Boolean pbAutoRunTests True
         Property Boolean pbUseUIIfInDebugger True
         Property Boolean pbUseUI True 
+        // Set to False when the host program supplies its own test-runner window and does not want
+        // the framework's built-in one. AutoRun also skips the built-in window automatically when a
+        // main panel already exists, so a host with its own UI normally needs to set nothing.
+        Property Boolean pbUseBuiltInUI True
 
         Property String psUnitTestTestingPackage
         Property String[] psUnitTestTestingPackageArray
@@ -118,9 +122,17 @@ Class cDFUnitTestApplication is a cDFUnitFixture
         Get pbUseUI to bUseUI
         
         If (bUseUI or (IsDebuggerPresent() and pbUseUIIfInDebugger(Self))) Begin
-//            Object oUIApplication is a cDFUnitUIPanel
-//            End_Object 
-//            Start_UI
+            // Show the framework's own test-runner window - but only when the host program has not
+            // supplied a UI of its own. Every DataFlex Panel sets phoMainPanel of ghoApplication in
+            // its End_Construct_Object, so a non-zero handle here means the host already owns the
+            // interface; it called AutoRun purely for the command-line arbitration above and will
+            // activate its own view. A host may also suppress this outright with pbUseBuiltInUI.
+            // Start_UI runs the message loop and does not return until the window is closed.
+            If (pbUseBuiltInUI(Self) and (phoMainPanel(ghoApplication) = 0)) Begin
+                Object oUIApplication is a cDFUnitUIPanel
+                End_Object
+                Start_UI
+            End
         End
         Else Begin
             Object oConsoleReporter is a cDFUnitConsoleReporter

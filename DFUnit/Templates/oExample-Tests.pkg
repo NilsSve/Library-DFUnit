@@ -1,0 +1,63 @@
+﻿// oExample-Tests.pkg - a worked example, and the shape every test file follows.
+//
+// To add tests of your own: copy this file to o<YourSubject>-Tests.pkg, add a
+// matching Use line in oUnit_Tests.pkg, and delete this example once you no
+// longer need it.
+//
+// Only procedures carrying { Published=True } are discovered and run as tests.
+// A procedure without it is an ordinary helper - useful for shared setup code.
+//
+// The common assertions (all take an optional trailing message):
+//     Send Assert            bCondition            sMessage
+//     Send AssertFalse       bCondition            sMessage
+//     Send AssertSAreEqual   sExpected  sActual    sMessage
+//     Send AssertIAreEqual   iExpected  iActual    sMessage
+//     Send AssertNAreEqual   nExpected  nActual    sMessage
+//     Send AssertDAreEqual   dExpected  dActual    sMessage
+//     Send AssertStrArrAreEqual asExpected asActual sMessage
+// ...plus the AreNotEqual twin of each, the BigInt/DateTime/TimeSpan variants,
+// and the array forms in DFUnit\Testing\AssertArray.pkg.
+
+Use DFUnit\Fixturing\Fixture.pkg
+
+Object oExample_Tests is a cTestFixture
+    Set psTestFixtureName to "Example"
+
+    // Runs before each { Published=True } procedure in this fixture.
+    Procedure Setup
+    End_Procedure
+
+    // Runs after each one - reset whatever Setup or the test changed.
+    Procedure TearDown
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_A_Boolean_Condition
+        Send Assert True "True should be True."
+        Send AssertFalse False "False should be False."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Two_Strings_Are_Equal
+        String sActual
+        Move (Lowercase("ABC")) to sActual
+        Send AssertSAreEqual "abc" sActual "Lowercase should fold ABC to abc."
+    End_Procedure
+
+    { Published=True }
+    Procedure Test_Two_Integers_Are_Equal
+        Integer iActual
+        Move (Length("DataFlex")) to iActual
+        Send AssertIAreEqual 8 iActual "DataFlex is eight characters long."
+    End_Procedure
+
+    // An error raised between ExpectError and UnExpectError is swallowed, so a
+    // test can prove that bad input really does raise - without failing the run.
+    { Published=True }
+    Procedure Test_An_Expected_Error_Is_Not_A_Failure
+        Send ExpectError DFERR_PROGRAM
+        Error DFERR_PROGRAM "An expected error."
+        Send UnExpectError DFERR_PROGRAM
+    End_Procedure
+
+End_Object
