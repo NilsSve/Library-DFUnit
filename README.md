@@ -26,12 +26,13 @@ the workspace folder:
 powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUnit*\SetupUnitTests.ps1)[0] -AddProject
 ```
 
-That drops three files into `AppSrc` and adds `UnitTests.src` to the workspace's project
+That drops four files into `AppSrc` and adds `UnitTests.src` to the workspace's project
 list (drop `-AddProject` to add the project yourself in the Studio):
 
 | File | What it is |
 |---|---|
 | `UnitTests.src` | The test program. Compile and run it; you should not need to edit it again. |
+| `UnitTests.cfg` | The project settings: 64-bit, and manifest generation off for build-server compatibility. |
 | `oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
 | `oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
 

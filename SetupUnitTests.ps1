@@ -160,18 +160,22 @@ if ($AddProject) {
 }
 
 # ---------------------------------------------------------------- what next
+$alreadyAProject = $false
+if ($sws) {
+    $alreadyAProject = ([System.IO.File]::ReadAllText($sws.FullName) -match '"UnitTests\.src"')
+}
+
 Write-Host ""
 Write-Host "Next:" -ForegroundColor Cyan
-if (-not $AddProject) {
-    if ($sws) {
-        Write-Host ("  1. Add UnitTests.src to the projects of {0}" -f $sws.Name)
-        Write-Host "     (Studio: right-click the workspace > Add > Add Project, or re-run this"
-        Write-Host "      script with -AddProject to have it edited for you.)"
-    } else {
-        Write-Host "  1. Add UnitTests.src to the workspace's project list."
-    }
+if ($alreadyAProject) {
+    Write-Host ("  1. {0} already lists UnitTests.src as a project - reopen the workspace in" -f $sws.Name)
+    Write-Host "     the Studio if it is open, so it picks the project up."
+} elseif ($sws) {
+    Write-Host ("  1. Add UnitTests.src to the projects of {0}" -f $sws.Name)
+    Write-Host "     (Studio: right-click the workspace > Add > Add Project, or re-run this"
+    Write-Host "      script with -AddProject to have it edited for you.)"
 } else {
-    Write-Host "  1. Reopen the workspace in the Studio so it picks up the new project."
+    Write-Host "  1. Add UnitTests.src to the workspace's project list."
 }
 Write-Host "  2. Compile and run UnitTests - the four example tests should pass."
 Write-Host "  3. Write your own: copy oExample-Tests.pkg to o<Subject>-Tests.pkg and add"
