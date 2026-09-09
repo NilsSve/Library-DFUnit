@@ -20,16 +20,22 @@ you write should ever live there.
 
 **2. Copy in the scaffold.** The test program and the test files belong to *your*
 workspace, not to the package, so they have to be copied out of it and made writable.
-Run this once from the workspace folder:
+Run `SetupUnitTests.bat` from the package folder, once, with the workspace folder as the
+working directory:
 
 ```
 DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.bat -AddProject
 ```
 
-or, if you would rather not type the checkout's SHA:
+**Where the package folder is depends on how it got there.** `package install` puts a
+checkout under the workspace's own `DfPkg\`; a plain `df-cli config` (after editing the
+pin by hand, say) resolves it into the machine-wide cache instead, at
+`%ProgramData%\DataFlex\Packages\Cache\`, and the workspace copy reappears the next time
+something builds against it. So if `DfPkg` has no DFUnit folder, look in the cache - or
+let this find it in either place:
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUnit*\SetupUnitTests.ps1)[0] -AddProject
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& (Get-ChildItem 'DfPkg', (Join-Path $env:ProgramData 'DataFlex\Packages\Cache') -Directory -Filter '*DFUnit*' -EA 0 | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'SetupUnitTests.ps1' }) -AddProject"
 ```
 
 That drops four files into `AppSrc` and adds `UnitTests.src` to the workspace's project

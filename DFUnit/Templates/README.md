@@ -13,10 +13,12 @@ They are the starter files your **own** workspace owns. Copy them out first:
 SetupUnitTests.bat
 ```
 
-in the package folder — or, from your workspace folder:
+in this folder's parent, with your workspace folder as the working directory — or, if you
+would rather not go looking for it (the package lives under the workspace's `DfPkg\` or in
+`%ProgramData%\DataFlex\Packages\Cache\`, depending on how it was installed):
 
 ```
-powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUnit*\SetupUnitTests.ps1)[0]
+powershell -NoProfile -ExecutionPolicy Bypass -Command "& (Get-ChildItem 'DfPkg', (Join-Path $env:ProgramData 'DataFlex\Packages\Cache') -Directory -Filter '*DFUnit*' -EA 0 | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'SetupUnitTests.ps1' })"
 ```
 
 That drops them into your workspace's `AppSrc` with the `.template` suffix stripped and
