@@ -61,6 +61,23 @@ if (-not (Test-Path -LiteralPath $Workspace -PathType Container)) {
 }
 $Workspace = (Resolve-Path -LiteralPath $Workspace).Path
 
+# Guard against scaffolding into the package itself - which is what happens if this
+# script is double-clicked from Explorer, since the working directory is then the
+# package folder. The package is read-only and owned by the package manager.
+if ($Workspace.TrimEnd('\') -eq $PSScriptRoot.TrimEnd('\') -or
+    $Workspace.StartsWith($PSScriptRoot.TrimEnd('\') + '\', [StringComparison]::OrdinalIgnoreCase)) {
+    Fail ("That is the DFUnit package folder, not a workspace:`n  $Workspace`n" +
+          "Run this from your own workspace folder, or pass -Workspace <folder>.")
+}
+
+# A DataFlex workspace has a .sws file. Without one we are almost certainly pointed at
+# the wrong folder, and copying source files there would just make a mess.
+if (-not (Get-ChildItem -LiteralPath $Workspace -Filter '*.sws' -File)) {
+    Fail ("No .sws file in:`n  $Workspace`n" +
+          "That does not look like a DataFlex workspace. Run this from your workspace" +
+          " folder, or pass -Workspace <folder>.")
+}
+
 # ---------------------------------------------------------------- the templates
 $templates = Join-Path $PSScriptRoot 'DFUnit\Templates'
 if (-not (Test-Path -LiteralPath $templates -PathType Container)) {
@@ -99,18 +116,26 @@ Write-Host ""
 # ---------------------------------------------------------------- copy
 $copied  = 0
 $skipped = @()
-foreach ($file in Get-ChildItem -LiteralPath $templates -File) {
-    $target = Join-Path $AppSrc $file.Name
+# The templates carry a .template suffix inside the package, so that nothing in the
+# read-only package folder looks like a source file you could add as a project. The
+# suffix is stripped on the way out.
+$sources = @(Get-ChildItem -LiteralPath $templates -File -Filter '*.template')
+if ($sources.Count -eq 0) {
+    Fail "No *.template files found in $templates"
+}
+foreach ($file in $sources) {
+    $name   = $file.Name -replace '\.template$', ''
+    $target = Join-Path $AppSrc $name
     if ((Test-Path -LiteralPath $target) -and (-not $Force)) {
-        $skipped += $file.Name
-        Write-Host ("  skipped  {0}  (already exists - pass -Force to overwrite)" -f $file.Name) -ForegroundColor Yellow
+        $skipped += $name
+        Write-Host ("  skipped  {0}  (already exists - pass -Force to overwrite)" -f $name) -ForegroundColor Yellow
         continue
     }
     Copy-Item -LiteralPath $file.FullName -Destination $target -Force
     # The package folder is read-only, and Copy-Item carries that attribute across.
     Set-ItemProperty -LiteralPath $target -Name IsReadOnly -Value $false
     $copied++
-    Write-Host ("  copied   {0}" -f $file.Name) -ForegroundColor Green
+    Write-Host ("  copied   {0}" -f $name) -ForegroundColor Green
 }
 
 # ---------------------------------------------------------------- the .sws project entry

@@ -19,8 +19,14 @@ design** - the package manager owns them and replaces them on every update, so n
 you write should ever live there.
 
 **2. Copy in the scaffold.** The test program and the test files belong to *your*
-workspace, so they get copied out of the package and made writable. Run this once from
-the workspace folder:
+workspace, not to the package, so they have to be copied out of it and made writable.
+Run this once from the workspace folder:
+
+```
+DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.cmd -AddProject
+```
+
+or, if you would rather not type the checkout's SHA:
 
 ```
 powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUnit*\SetupUnitTests.ps1)[0] -AddProject
@@ -29,12 +35,18 @@ powershell -NoProfile -ExecutionPolicy Bypass -File (Resolve-Path .\DfPkg\*DFUni
 That drops four files into `AppSrc` and adds `UnitTests.src` to the workspace's project
 list (drop `-AddProject` to add the project yourself in the Studio):
 
-| File | What it is |
+| Copied out as | What it is |
 |---|---|
-| `UnitTests.src` | The test program. Compile and run it; you should not need to edit it again. |
-| `UnitTests.cfg` | The project settings: 64-bit, and manifest generation off for build-server compatibility. |
-| `oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
-| `oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
+| `AppSrc\UnitTests.src` | The test program. **This is the one you add as a project and compile.** You should not need to edit it again. |
+| `AppSrc\UnitTests.cfg` | Its project settings: 64-bit, and manifest generation off for build-server compatibility. |
+| `AppSrc\oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
+| `AppSrc\oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
+
+> **Do not add anything from the package's `DFUnit\Templates` folder as a project.**
+> Those files carry a `.template` suffix and are not on any AppSrc search path, so the
+> Studio has nothing to compile and reports no error at all - it simply does nothing.
+> `df-cli` is more forthcoming: *"Project ... could not be found in any AppSrc paths"*.
+> Step 2 exists precisely to get writable copies into your own `AppSrc`.
 
 Compile `UnitTests` and run it. The runner window opens and the example tests pass. From
 then on, adding tests is: copy `oExample-Tests.pkg` to `o<Subject>-Tests.pkg`, write the
