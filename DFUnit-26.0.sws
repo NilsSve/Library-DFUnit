@@ -3,6 +3,10 @@
     "df": 26.0,
     "package": {
         "df-min": 26.0,
+        "install": [
+            "SetupUnitTests.bat",
+            "SetupUnitTests.ps1"
+        ],
         "license": "MIT",
         "version": "0.1.0"
     },

@@ -64,20 +64,55 @@ if (-not (Test-Path -LiteralPath $Workspace -PathType Container)) {
 }
 $Workspace = (Resolve-Path -LiteralPath $Workspace).Path
 
-function Test-InsidePackage([string] $path) {
-    $root = $PSScriptRoot.TrimEnd('\')
-    return ($path.TrimEnd('\') -eq $root -or
-            $path.StartsWith($root + '\', [StringComparison]::OrdinalIgnoreCase))
+# A folder is the DFUnit package only if it holds the templates themselves. Testing for a
+# folder called Templates is not enough - a workspace may well have one of its own.
+function Test-IsPackage([string] $folder) {
+    if (-not $folder) { return $false }
+    return (Test-Path -LiteralPath (Join-Path $folder 'Templates\UnitTests.src.template') -PathType Leaf)
 }
 
-# Double-clicked from Explorer, the working directory IS the package folder, so the
-# default would scaffold into the package - which is read-only and owned by the package
-# manager. But the workspace is knowable in that case: a package checkout lives at
-# <workspace>\DfPkg\<name>\, so two levels up is the workspace. Use it if it looks like
-# one, and only complain when it does not (a package resolved into the machine-wide cache
-# has no workspace above it).
-if ((-not $PSBoundParameters.ContainsKey('Workspace')) -and (Test-InsidePackage $Workspace)) {
-    $guess = Split-Path -Parent (Split-Path -Parent $PSScriptRoot)
+function Test-Within([string] $path, [string] $root) {
+    if (-not $root) { return $false }
+    $r = $root.TrimEnd('\')
+    return ($path.TrimEnd('\') -eq $r -or
+            $path.StartsWith($r + '\', [StringComparison]::OrdinalIgnoreCase))
+}
+
+# ---------------------------------------------------------------- find the package
+# The package declares SetupUnitTests.bat/.ps1 in its manifest's "install" list, so a copy
+# of this script also lands in the consuming workspace's own folder - which is where it is
+# actually easy to find. That copy has no Templates beside it, so look for the package:
+# under the workspace's DfPkg first, then the machine-wide package cache. Newest wins.
+$pkgRoot = $null
+if (Test-IsPackage $PSScriptRoot) {
+    $pkgRoot = $PSScriptRoot
+}
+else {
+    $searchIn = @((Join-Path $Workspace 'DfPkg'),
+                  (Join-Path $env:ProgramData 'DataFlex\Packages\Cache'))
+    $pkgRoot = Get-ChildItem -LiteralPath $searchIn -Directory -Filter '*DFUnit*' -ErrorAction SilentlyContinue |
+               Sort-Object LastWriteTime -Descending |
+               Where-Object { Test-IsPackage $_.FullName } |
+               Select-Object -First 1 -ExpandProperty FullName
+    if ($pkgRoot) {
+        Write-Host ""
+        Write-Host "Using the DFUnit package at:" -ForegroundColor Yellow
+        Write-Host "  $pkgRoot"
+    }
+}
+if (-not $pkgRoot) {
+    Fail ("Could not find the DFUnit package.`nLooked beside this script, in " +
+          "$Workspace\DfPkg and in $env:ProgramData\DataFlex\Packages\Cache.`n" +
+          "Is the package installed in this workspace?")
+}
+
+# Double-clicked inside the package folder, the working directory IS the package, and the
+# default would scaffold into it - read-only, and owned by the package manager. The
+# workspace is knowable there: a checkout lives at <workspace>\DfPkg\<name>\, so two
+# levels up is the workspace. Use it when it looks like one, and complain only when there
+# is nothing above (a package resolved into the machine-wide cache has no workspace).
+if ((-not $PSBoundParameters.ContainsKey('Workspace')) -and (Test-Within $Workspace $pkgRoot)) {
+    $guess = Split-Path -Parent (Split-Path -Parent $pkgRoot)
     if ($guess -and (Test-Path -LiteralPath $guess -PathType Container) -and
         (Get-ChildItem -LiteralPath $guess -Filter '*.sws' -File -ErrorAction SilentlyContinue)) {
         $Workspace = (Resolve-Path -LiteralPath $guess).Path
@@ -87,7 +122,7 @@ if ((-not $PSBoundParameters.ContainsKey('Workspace')) -and (Test-InsidePackage 
     }
 }
 
-if (Test-InsidePackage $Workspace) {
+if (Test-Within $Workspace $pkgRoot) {
     Fail ("That is the DFUnit package folder, not a workspace:`n  $Workspace`n" +
           "Run this from your own workspace folder, or pass -Workspace <folder>.")
 }
@@ -100,11 +135,7 @@ if (-not (Get-ChildItem -LiteralPath $Workspace -Filter '*.sws' -File)) {
           " folder, or pass -Workspace <folder>.")
 }
 
-# ---------------------------------------------------------------- the templates
-$templates = Join-Path $PSScriptRoot 'Templates'
-if (-not (Test-Path -LiteralPath $templates -PathType Container)) {
-    Fail "Template folder not found: $templates`nRun this script from the DFUnit package folder, not a copy of it."
-}
+$templates = Join-Path $pkgRoot 'Templates'
 
 # ---------------------------------------------------------------- the AppSrc folder
 if (-not $AppSrc) {

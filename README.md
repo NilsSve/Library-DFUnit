@@ -29,25 +29,27 @@ you write should ever live there.
 
 **2. Copy in the scaffold.** The test program and the test files belong to *your*
 workspace, not to the package, so they have to be copied out of it and made writable.
-Run `SetupUnitTests.bat` once - **double-clicking it in the package folder works**: a
-package checkout lives at `<workspace>\DfPkg\<name>\`, so it finds the workspace above
-itself and says which one it picked. It also pauses before closing, so you can read what
-it did. Or run it from the workspace folder:
+
+**The package puts the launcher where you can find it.** `SetupUnitTests.bat` and
+`SetupUnitTests.ps1` are in the manifest's `install` list, so installing the package drops
+a copy of both into your own workspace folder, beside the `.sws`. Double-click the `.bat`
+there and it does the rest - it locates the package itself, and pauses before closing so
+you can read what it did. They arrive read-only, because the package manager owns them;
+that does not stop them running.
 
 ```
-DfPkg\NilsSve_DFUnit_26.0-<sha>\SetupUnitTests.bat -AddProject
+SetupUnitTests.bat -AddProject
 ```
 
-**Where the package folder is depends on how it got there.** `package install` puts a
-checkout under the workspace's own `DfPkg\`; a plain `df-cli config` (after editing the
-pin by hand, say) resolves it into the machine-wide cache instead, at
-`%ProgramData%\DataFlex\Packages\Cache\`, and the workspace copy reappears the next time
-something builds against it. So if `DfPkg` has no DFUnit folder, look in the cache - or
-let this find it in either place:
+The same script works from anywhere: run it from inside the package folder and it finds
+the workspace above it (a checkout lives at `<workspace>\DfPkg\<name>\`); run it from a
+workspace and it finds the package under `DfPkg\` or, failing that, in the machine-wide
+cache at `%ProgramData%\DataFlex\Packages\Cache\`. Whichever it picks, it says so before
+copying anything.
 
-```
-powershell -NoProfile -ExecutionPolicy Bypass -Command "& (Get-ChildItem 'DfPkg', (Join-Path $env:ProgramData 'DataFlex\Packages\Cache') -Directory -Filter '*DFUnit*' -EA 0 | Sort-Object LastWriteTime -Descending | Select-Object -First 1 | ForEach-Object { Join-Path $_.FullName 'SetupUnitTests.ps1' }) -AddProject"
-```
+> A dependency added as a **local path** rather than a package gets none of this -
+> *"Library ... is a local library and therefore its install files are ignored."* Run the
+> `SetupUnitTests.bat` inside the library folder instead.
 
 That drops four files into `AppSrc` and adds `UnitTests.src` to the workspace's project
 list (drop `-AddProject` to add the project yourself in the Studio):
