@@ -3,6 +3,7 @@
     "df": 26.0,
     "package": {
         "df-min": 26.0,
+        "icon": "RDC-Mark.svg",
         "install": [
             "SetupUnitTests.bat",
             "SetupUnitTests.ps1"
