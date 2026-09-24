@@ -26,6 +26,10 @@ you write should ever live there.
 > *Failed to configure* and leaves the workspace **BROKEN** - and `package uninstall`
 > cannot rescue it, because uninstall configures the workspace first. Removing the
 > dependency and adding the package again is the clean route.
+>
+> **Renamed 2026-09-24:** the package file is now `RDC-DFUnit-Library-26.0.sws` - every RDC Tools
+> package is named `RDC-<name>-Library-26.0`. The same rule applies: the new `"sws"` name goes in
+> the same edit as a `"version"` at or after that commit.
 
 ```
 SetupUnitTests.bat -AddProject
@@ -90,7 +94,7 @@ at the source - which is exactly what the folder prevents.
 
 The framework code itself is self-sustaining aside from the DataFlex APIs and still compiles from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - a library entry pointing at a workspace file for your release - and set the test program up by hand: copy the four files from `Templates` into your workspace's `AppSrc` and drop the `.template` suffix.
 
-**Two workspace files ship: `DFUnit-26.0.sws` and `DFUnit-25.0.sws`.** A DataFlex 25 Studio cannot read the JSON one, so the INI file for 25.0 is kept alongside it; point your library entry at `DFUnit-25.0.sws`. The ones for 20.0 - 24.0 were removed. If you need one, they are six lines and the 25.0 file is the template - only `Version=` changes:
+**Two workspace files ship: `RDC-DFUnit-Library-26.0.sws` and `DFUnit-25.0.sws`.** A DataFlex 25 Studio cannot read the JSON one, so the INI file for 25.0 is kept alongside it; point your library entry at `DFUnit-25.0.sws`. The ones for 20.0 - 24.0 were removed. If you need one, they are six lines and the 25.0 file is the template - only `Version=` changes:
 
 ```ini
 [Properties]
