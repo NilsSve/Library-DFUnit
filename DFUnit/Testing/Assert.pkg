@@ -160,21 +160,21 @@ Class cDFUnitAssert_Mixin is a Mixin
         End
         
         Move 0 to iItem
-        Move (SizeOfArray(asActual)) to iSize
+        Move (SizeOfArray(asExpected)) to iSize
         Decrement iSize
         Move ("Should have been:") to asMessages[iItem]
         Increment iItem
         For iCount from 0 to iSize
-            Move asActual[iCount] to asMessages[iItem]
+            Move asExpected[iCount] to asMessages[iItem]
             Increment iItem
         Loop
 
-        Move (SizeOfArray(asExpected)) to iSize
+        Move (SizeOfArray(asActual)) to iSize
         Decrement iSize
         Move ("But was:") to asMessages[iItem]
         Increment iItem
         For iCount from 0 to iSize
-            Move asExpected[iCount] to asMessages[iItem]
+            Move asActual[iCount] to asMessages[iItem]
             Increment iItem
         Loop
 
