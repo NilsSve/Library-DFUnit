@@ -21,7 +21,6 @@ Class cDFUnitXMLReporter is a cDFUnitResultCollector_Mixin
     
     {Visibility=Private}
     Procedure WriteTest tDFUnitTestResult oTestResult
-        String[] asMessages
         TimeSpan tsTook
         String sMessage sErrorExtenders sTime
         Integer iIterator iMessageIterator iMaxIndex iMaxMessageIndex
@@ -60,14 +59,19 @@ Class cDFUnitXMLReporter is a cDFUnitResultCollector_Mixin
             Send Write (SFormat('<error message="%1"></error>', sMessage))
         Loop
         
+        // Each failed assertion's messages are read straight from the result, never copied into
+        // one reused String[] local. Most asserts pass a fixed-size String[1]; once that had been
+        // copied into the local, copying the next assertion's array of another size (the
+        // AssertArrayAreEqual lines) raised Error 4381 "Cannot convert array of 'STRING[]' to
+        // array of 'STRING[1]'" - a modal error box on a -c build run - and the second
+        // <failure> repeated the first one's text.
         Move (SizeOfArray(oTestResult.aFailedAssertions) - 1) to iMaxIndex
         For iIterator from 0 to iMaxIndex
-            Move (oTestResult.aFailedAssertions[iMaxIndex].sAssertMessage + XML_NEWLINE_REPLACE) to sMessage
+            Move (oTestResult.aFailedAssertions[iIterator].sAssertMessage + XML_NEWLINE_REPLACE) to sMessage
             
-            Move oTestResult.aFailedAssertions[iIterator].asMessages to asMessages
-            Move (SizeOfArray(asMessages) - 1) to iMaxMessageIndex
+            Move (SizeOfArray(oTestResult.aFailedAssertions[iIterator].asMessages) - 1) to iMaxMessageIndex
             For iMessageIterator from 0 to iMaxMessageIndex
-                Move (Append(sMessage, asMessages[iMessageIterator] + XML_NEWLINE_REPLACE)) to sMessage
+                Move (Append(sMessage, oTestResult.aFailedAssertions[iIterator].asMessages[iMessageIterator] + XML_NEWLINE_REPLACE)) to sMessage
             Loop
             
             Move (Replaces("\n", sMessage, XML_NEWLINE_REPLACE)) to sMessage
