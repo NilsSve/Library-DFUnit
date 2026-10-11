@@ -1,4 +1,4 @@
-﻿Use DFUnit\Testing\Assert.pkg
+Use DFUnit\Testing\Assert.pkg
 Use DFUnit\Testing\AssertArray.pkg
 Use DFUnit\Testing\TestCollector.pkg
 Use DFUnit\Fixturing\FixtureCollector.pkg
@@ -22,7 +22,13 @@ Class cDFUnitFixture is a cObject
         Integer iSelf iDesktop
         Move (Desktop) to iDesktop
         Move (Self) to iSelf
+        // The error object is no fixture. Its handle is ghoErrorHandler from DataFlex 23 and Error_Object_Id
+        // before it.
+#IF (!@ < 230)
+        If (Error_Object_Id <> iSelf and (iDesktop <> iSelf) and (ghoTestApplication <> iSelf)) Begin
+#ELSE
         If (ghoErrorHandler <> iSelf and (iDesktop <> iSelf) and (ghoTestApplication <> iSelf)) Begin
+#ENDIF
             Delegate Send DFUnitRegisterFixture Self
         End
     End_Procedure

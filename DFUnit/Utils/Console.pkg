@@ -1,4 +1,4 @@
-﻿Use Windows.pkg
+Use Windows.pkg
 
 { Visibility=Private }
 External_Function DFUnit_WinAPI_TerminateProcess "TerminateProcess" Kernel32.dll Handle hProcess Integer iExitCode Returns Integer

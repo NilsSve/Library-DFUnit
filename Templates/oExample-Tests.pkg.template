@@ -1,4 +1,4 @@
-﻿// oExample-Tests.pkg - a worked example, and the shape every test file follows.
+// oExample-Tests.pkg - a worked example, and the shape every test file follows.
 //
 // To add tests of your own: copy this file to o<YourSubject>-Tests.pkg, add a
 // matching Use line in oUnit_Tests.pkg, and delete this example once you no

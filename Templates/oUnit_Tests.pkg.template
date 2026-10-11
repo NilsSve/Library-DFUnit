@@ -1,4 +1,4 @@
-﻿// oUnit_Tests.pkg - the root fixture for this workspace's unit tests.
+// oUnit_Tests.pkg - the root fixture for this workspace's unit tests.
 //
 // This is the ONLY file you edit when you add a new test file: one Use line per
 // subject. Keep one file per class or per function under test, named

@@ -1,4 +1,4 @@
-﻿Use DFUnit\Globals.pkg
+Use DFUnit\Globals.pkg
 Use DFUnit\Testing\Assert.pkg
 Use DFUnit\Testing\AssertArray.pkg
 

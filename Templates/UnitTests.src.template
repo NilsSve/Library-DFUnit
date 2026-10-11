@@ -1,4 +1,4 @@
-﻿// UnitTests.src - the unit-test program for this workspace.
+// UnitTests.src - the unit-test program for this workspace.
 //
 // Copied here from the DFUnit package by SetupUnitTests.bat. It has to live in your
 // OWN AppSrc: DataFlex resolves a project name against the workspace's own AppSrc

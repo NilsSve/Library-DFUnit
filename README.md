@@ -89,23 +89,16 @@ it shadowed DFUnit's, so the globals were never defined. A same-basename clash a
 search path resolves by an order the workspace file cannot steer, so it can only be fixed
 at the source - which is exactly what the folder prevents.
 
-### Getting Started (DataFlex 20 - 25)
+### Getting Started (DataFlex 19.1 - 25)
 
 
-The framework code itself is self-sustaining aside from the DataFlex APIs and still compiles from DataFlex 20.0 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - a library entry pointing at a workspace file for your release - and set the test program up by hand: copy the four files from `Templates` into your workspace's `AppSrc` and drop the `.template` suffix.
+The framework code itself is self-sustaining aside from the DataFlex APIs and compiles from DataFlex 19.1 up. Below DataFlex 26 there is no package manager, so add DFUnit the classic way - a library entry pointing at a workspace file for your release - and set the test program up by hand: copy the four files from `Templates` into your workspace's `AppSrc` and drop the `.template` suffix.
 
-**Two workspace files ship: `RDC-DFUnit-Library.sws` and `DFUnit-25.0.sws`.** A DataFlex 25 Studio cannot read the JSON one, so the INI file for 25.0 is kept alongside it; point your library entry at `DFUnit-25.0.sws`. The ones for 20.0 - 24.0 were removed. If you need one, they are six lines and the 25.0 file is the template - only `Version=` changes:
+**A workspace file ships for each of these versions:** `DFUnit-19.1.sws`, `DFUnit-20.1.sws`, `DFUnit-23.0.sws`, `DFUnit-24.0.sws` and `DFUnit-25.0.sws`, beside `RDC-DFUnit-Library.sws` for the package manager of DataFlex 26. Point your library entry at the one of your version. For a version in between, copy one and change `Version=`; the file is six lines.
 
-```ini
-[Properties]
-Version=24.0
-[WorkspacePaths]
-ConfigFile=.\Config.ws
-[Conditionals]
-Is$WebApp=False
-```
+No source file starts with a UTF-8 mark: DataFlex 19.1 reads a mark as text and stops there, and the sources are plain ASCII, so the later versions read them the same without it.
 
-or recover an original with `git show a2e8850:DFUnit/DFUnit-24.0.sws`.
+**DataFlex 20.1:** the tests run and the result file is written, but an unattended run (`-c`) ends with a crash code instead of 0 or -1. The cause is inside the test run and is not found yet. DataFlex 19.1, 23, 24, 25 and 26 end as they should.
 
 Now let's walk through the essentials:
 
