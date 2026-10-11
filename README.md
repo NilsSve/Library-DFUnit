@@ -98,8 +98,6 @@ The framework code itself is self-sustaining aside from the DataFlex APIs and co
 
 No source file starts with a UTF-8 mark: DataFlex 19.1 reads a mark as text and stops there, and the sources are plain ASCII, so the later versions read them the same without it.
 
-**DataFlex 20.1:** the tests run and the result file is written, but an unattended run (`-c`) ends with a crash code instead of 0 or -1. The cause is inside the test run and is not found yet. DataFlex 19.1, 23, 24, 25 and 26 end as they should.
-
 Now let's walk through the essentials:
 
 #### Project setup

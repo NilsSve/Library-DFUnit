@@ -188,11 +188,16 @@ Class cDFUnitLineBasedReporter_Mixin is a Mixin
         Set piScope to iScope
     End_Procedure
     
+    // Never below 0. The outermost fixture ("All Tests") does not raise the scope when it starts, so its end
+    // must not lower it either: the summary lines were then indented with Repeat(" ", -2). A negative count
+    // ends the program on DataFlex 20.1 and gives 65533 blanks on 19.1; only from DataFlex 23 it gives nothing.
     { Visibility=Private }
     Procedure DecreaseScope
         Integer iScope
         Get CurrentScope to iScope
-        Decrement iScope
+        If (iScope > 0) Begin
+            Decrement iScope
+        End
         Set piScope to iScope
     End_Procedure
     
