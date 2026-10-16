@@ -30,7 +30,7 @@ Define DFUNIT_UI_WINDOW_WIDTH for 425
 { Visibility=Private }
 Class cDFUnitUIRunButton is a Button
     Procedure OnClick
-        Send ManualRunTests of ghoTestApplication
+        Send DFUnitRun
     End_Procedure
 End_Class
 
@@ -72,6 +72,8 @@ Class cDFUnitUIPanel is a Panel
         Property Handle poMainView
         { Visibility=Private }
         Property Handle poOutputBox
+        { Visibility=Private }
+        Property Boolean pbRunning False
 
         String sLabel
 
@@ -158,6 +160,7 @@ Class cDFUnitUIPanel is a Panel
                     Set Size to (DFUNIT_UI_WINDOW_HEIGHT - 45) (DFUNIT_UI_WINDOW_WIDTH - 25)
                     Set Location to (6 + (Hi(Size(oRunTestsButton)))) 10
                     Set peAnchors to anAll
+                    Set pbShowLinesAsTheyCome to True
                 End_Object
                 Set poOutputBox to oOutputBox
 
@@ -240,8 +243,8 @@ Class cDFUnitUIPanel is a Panel
     End_Procedure
 
     // A run in the window starts here (AutoRun sends it before Start_UI): the output box reports the runs from
-    // now on, the window is shown - in the size and place it had when it was closed - and the tests run unless
-    // the program was started with -n.
+    // now on, the window is shown - in the size and place it had when it was closed - and painted whole, and the
+    // tests run unless the program was started with -n.
     Procedure StartRunner
         Boolean bAutoRunTests
 
@@ -249,10 +252,27 @@ Class cDFUnitUIPanel is a Panel
         Send AddReporter of ghoTestApplication (poOutputBox(Self))
         Send Activate_View of (poMainView(Self))
         Send FitViewToWindow
+        Send PumpMsgQueue of Desktop
         Get pbAutoRunTests of ghoTestApplication to bAutoRunTests
         If (bAutoRunTests) Begin
-            Send ManualRunTests of ghoTestApplication
+            Send DFUnitRun
         End
+    End_Procedure
+
+    // One run of the tests. The window paints and answers the mouse while it runs (the output box lets it after
+    // each line), so Run tests! is greyed meanwhile, and a second run is not started inside the first.
+    Procedure DFUnitRun
+        Handle hoRunButton
+
+        If (pbRunning(Self)) Begin
+            Procedure_Return
+        End
+        Set pbRunning to True
+        Move (oRunTestsButton(poMainView(Self))) to hoRunButton
+        Set Enabled_State of hoRunButton to False
+        Send ManualRunTests of ghoTestApplication
+        Set Enabled_State of hoRunButton to True
+        Set pbRunning to False
     End_Procedure
 
     // The view fills the inside of the window and follows it when the window is sized; the anchors of its
