@@ -1,9 +1,13 @@
 ; UnitTests.cfg - project settings for the DFUnit test program.
 ;
-; Manifest generation is off on purpose: the DFUnit README asks for it, because the
-; Studio's manifest settings otherwise interfere with a console compile on a build
-; server. Platform=x64 makes a command-line build produce UnitTests64.exe rather than
-; silently falling back to 32-bit.
+; Platform=x64 makes a command-line build produce UnitTests64.exe rather than silently
+; falling back to 32-bit.
+; The manifest is off: df-cli does not write one, and with these two on a build on a build
+; server stops with "manifest file cannot be found". Without it Windows gives the program the
+; old common controls, and the buttons of the test-runner window show their text only. A
+; program built in the Studio can have them on (the Studio writes the manifest).
+; Icon is the icon of the program. [Icons] are the images of the test-runner window, built
+; into the program: it does not find them in the package's Bitmaps folder when it runs.
 [Application]
 IsWebApp=0
 BuildManifestFile=0
@@ -11,6 +15,7 @@ EmbedManifestFile=0
 DPIAware=1
 AutoGenerateMenus=0
 CompilerWarnings=1
+Icon=UnitTesting.ico
 [Compiler]
 Platform=x64
 64BitSuffix=64
@@ -20,3 +25,10 @@ AfterCompileProcessEnabled=0
 [Version]
 Include=0
 AutoIncrementBuild=0
+[Icons]
+UnitTesting.ico=UnitTesting.ico
+RunProgram.ico=RunProgram.ico
+ActionExit.ico=ActionExit.ico
+ActionUp.ico=ActionUp.ico
+ActionDown.ico=ActionDown.ico
+ActionRight.ico=ActionRight.ico

@@ -79,12 +79,18 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         // Failures / Errors and the trailing Tests: Succeeded!/Failure line)
         // appears flush without a number, and the counter doesn't show gaps.
         Property Boolean pbSuppressLineNumber False
+        // Where the line found last by FindNextError ends; 0 = search from the caret.
+        Property Integer piLastErrorEnd 0
+
+        On_Key Key_F3          Send FindNextError
+        On_Key Key_Ctrl+Key_N  Send FindNextError
     End_Procedure
     
     Procedure Start Handle hEnv
         String[] aMessages
         
         Set piLineNumber to 1
+        Set piLastErrorEnd to 0
         Forward Send Start      
         // This will set the array to zero for each run:
         Move "" to aMessages[SizeOfArray(aMessages)]
@@ -128,6 +134,30 @@ Class cDFUnitUIListReporter is a cDFUnitUIListInmediateReporter
         Loop
     End_Procedure
     
+    // Selects the next line of a failed test (CS_FailedClause) after the one found last; after the last one it
+    // starts from the top again. FindText searches on from the caret (its second argument is a flag), so the
+    // caret is first put behind the line found last - else the same line would be found again.
+    Procedure FindNextError
+        Integer iStart iEnd
+        String sSearchText
+
+        Move CS_FailedClause to sSearchText
+        Get piLastErrorEnd to iEnd
+        If (iEnd > 0) Begin
+            Send SetSel iEnd iEnd
+        End
+        Get FindText sSearchText 0 to iStart
+        If (iStart = -1) Begin
+            Send Beginning_of_Data
+            Get FindText sSearchText 0 to iStart
+        End
+        If (iStart <> -1) Begin
+            Move (iStart + Length(sSearchText)) to iEnd
+            Send SetSel iStart iEnd
+            Set piLastErrorEnd to iEnd
+        End
+    End_Procedure
+
     // Returns a four "digit" string line number with the format: 0001 to 9999
     // Pad string with up to 3 zeroes, depending on the size of iLineNumber
     Function PadStringWithZeroes Integer iLineNumber Returns String

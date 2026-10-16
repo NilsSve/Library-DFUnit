@@ -1,0 +1,235 @@
+// DFUnitUIPanel.pkg - the test-runner window of DFUnit: a main Panel with a ClientArea and one view. The view
+// shows the output of a run and has the buttons Run tests!, View Top, View Bottom, Next Error and Exit.
+//
+// AutoRun makes the window, in a run with the window only, and makes it ON THE DESKTOP. The window keeps its size
+// and place from one run of the program to the next (pbPreserveEnvironment of the application object): DataFlex
+// saves them when the program ends, and only a child of the desktop is told that it ends. (It used to be made
+// inside the test application object, so nothing was ever saved or restored.)
+// The program does not declare the window itself: DataFlex shows a panel of the program as soon as it is made,
+// so a console run (-c) - on a build server - would put a window on the screen.
+// The title of the window is psProduct of the application object.
+//
+// A child object made in a class's Construct_Object can have no methods of its own, so each button is a class.
+
+Use DFClient.pkg
+Use tWinStructs.pkg
+Use DFUnit\Reporting\ReporterManager.pkg
+Use DFUnit\Reporting\Reporters\UIListReporter.pkg
+
+{ Visibility=Private }
+Define DFUNIT_UI_WINDOW_HEIGHT for 630
+{ Visibility=Private }
+Define DFUNIT_UI_WINDOW_WIDTH for 425
+
+{ Visibility=Private }
+Class cDFUnitUIRunButton is a Button
+    Procedure OnClick
+        Send ManualRunTests of ghoTestApplication
+    End_Procedure
+End_Class
+
+{ Visibility=Private }
+Class cDFUnitUICloseButton is a Button
+    Procedure OnClick
+        Send Exit_Application
+    End_Procedure
+End_Class
+
+// The three buttons that move through the output. Each sends its message on to the panel.
+{ Visibility=Private }
+Class cDFUnitUITopButton is a Button
+    Procedure OnClick
+        Send DFUnitViewTop
+    End_Procedure
+End_Class
+
+{ Visibility=Private }
+Class cDFUnitUIBottomButton is a Button
+    Procedure OnClick
+        Send DFUnitViewBottom
+    End_Procedure
+End_Class
+
+{ Visibility=Private }
+Class cDFUnitUINextErrorButton is a Button
+    Procedure OnClick
+        Send DFUnitNextError
+    End_Procedure
+End_Class
+
+Class cDFUnitUIPanel is a Panel
+
+    Procedure Construct_Object
+        Forward Send Construct_Object
+
+        { Visibility=Private }
+        Property Handle poMainView
+        { Visibility=Private }
+        Property Handle poOutputBox
+
+        String sLabel
+
+        Get psProduct of ghoApplication to sLabel
+        If (sLabel = "") Begin
+            Move "DFUnit TestRunner" to sLabel
+        End
+        Set Label to sLabel
+        Set Icon to "UnitTesting.ico"
+        Set Size to DFUNIT_UI_WINDOW_HEIGHT DFUNIT_UI_WINDOW_WIDTH
+        // The place of the first run; after that the window opens where it was closed.
+        Set Location to 20 40
+        Set piMinSize to 300 (DFUNIT_UI_WINDOW_WIDTH - 100)
+        Set StatusBar_State to True
+        Set Border_Style to Border_Thick
+
+        { Visibility=Private }
+        Object oClientArea is a ClientArea
+            { Visibility=Private }
+            Object oDFUnitTestRunner_vw is a View
+                Set poMainView to oDFUnitTestRunner_vw
+
+                Set Size to DFUNIT_UI_WINDOW_HEIGHT DFUNIT_UI_WINDOW_WIDTH
+                Set Location to 0 0
+                Set Maximize_Icon to False
+                Set Minimize_Icon to False
+                Set pbSizeToClientArea to False
+                Set Sysmenu_Icon to False
+                Set Caption_Bar to False
+                Set Border_Style to Border_None
+
+                { Visibility=Private }
+                Object oRunTestsButton is a cDFUnitUIRunButton
+                    Set Size to 30 85
+                    Set Location to 5 10
+                    Set Label to "Run tests!"
+                    Set Form_FontWeight to FW_BOLD
+                    Set psImage to "RunProgram.ico"
+                    Set piImageSize to 42
+                    Set piImageMarginLeft to 15
+                End_Object
+
+                { Visibility=Private }
+                Object oViewTop_btn is a cDFUnitUITopButton
+                    Set Size to 14 66
+                    Set Location to 5 105
+                    Set Label to "View Top"
+                    Set psImage to "ActionUp.ico"
+                    Set piImageSize to 16
+                End_Object
+
+                { Visibility=Private }
+                Object oViewBottom_btn is a cDFUnitUIBottomButton
+                    Set Size to 14 66
+                    Set Location to 21 105
+                    Set Label to "View Bottom"
+                    Set psImage to "ActionDown.ico"
+                    Set piImageSize to 16
+                End_Object
+
+                { Visibility=Private }
+                Object oNextError_btn is a cDFUnitUINextErrorButton
+                    Set Size to 14 66
+                    Set Location to 21 177
+                    Set Label to "Next Error"
+                    Set psImage to "ActionRight.ico"
+                    Set piImageSize to 16
+                End_Object
+
+                { Visibility=Private }
+                Object oClose_btn is a cDFUnitUICloseButton
+                    Set Size to 30 70
+                    Set Location to 5 (DFUNIT_UI_WINDOW_WIDTH - 85)
+                    Set Label to "Exit"
+                    Set Form_FontWeight to FW_BOLD
+                    Set psImage to "ActionExit.ico"
+                    Set piImageSize to 36
+                    Set piImageMarginLeft to 15
+                    Set peAnchors to anTopRight
+                End_Object
+
+                { Visibility=Private }
+                Object oOutputBox is a cDFUnitUIListReporter
+                    Set Size to (DFUNIT_UI_WINDOW_HEIGHT - 45) (DFUNIT_UI_WINDOW_WIDTH - 25)
+                    Set Location to (6 + (Hi(Size(oRunTestsButton)))) 10
+                    Set peAnchors to anAll
+                End_Object
+                Set poOutputBox to oOutputBox
+
+            End_Object
+
+        End_Object
+
+        // F3 and Ctrl+N find the next line of a failed test from anywhere in the window.
+        On_Key Key_F3          Send DFUnitNextError
+        On_Key Key_Ctrl+Key_N  Send DFUnitNextError
+    End_Procedure
+
+    // A run in the window starts here (AutoRun sends it before Start_UI): the output box reports the runs from
+    // now on, the window is shown - in the size and place it had when it was closed - and the tests run unless
+    // the program was started with -n.
+    Procedure StartRunner
+        Boolean bAutoRunTests
+
+        Send AddReporter of ghoTestApplication (poOutputBox(Self))
+        Send Activate_View of (poMainView(Self))
+        Send FitViewToWindow
+        Get pbAutoRunTests of ghoTestApplication to bAutoRunTests
+        If (bAutoRunTests) Begin
+            Send ManualRunTests of ghoTestApplication
+        End
+    End_Procedure
+
+    // The view fills the inside of the window and follows it when the window is sized; the anchors of its
+    // controls do the rest. (A zoomed view does not do it: zoomed while it was made it kept its first size, and
+    // zoomed after it was activated it made the whole window open maximized.)
+    Procedure OnResize
+        Forward Send OnResize
+        Send FitViewToWindow
+    End_Procedure
+
+    { Visibility=Private }
+    Procedure FitViewToWindow
+        Handle hoView hoClient
+        Integer iVoid
+        tWinRect Area
+
+        Get poMainView to hoView
+        Get Client_Id to hoClient
+        If (hoView = 0 or hoClient = 0) Begin
+            Procedure_Return
+        End
+        If (Window_Handle(hoView) = 0 or Window_Handle(hoClient) = 0) Begin
+            Procedure_Return
+        End
+        Move (GetClientRect(Window_Handle(hoClient), AddressOf(Area))) to iVoid
+        Set GuiLocation of hoView to 0 0
+        Set GuiSize of hoView to (Area.bottom - Area.top) (Area.right - Area.left)
+    End_Procedure
+
+    // View Top: the first line of the output.
+    Procedure DFUnitViewTop
+        Handle hoOutput
+        Get poOutputBox to hoOutput
+        Send Beginning_of_Data of hoOutput
+        Set piLastErrorEnd of hoOutput to 0
+        Send Activate of hoOutput
+    End_Procedure
+
+    // View Bottom: the last line of the output.
+    Procedure DFUnitViewBottom
+        Handle hoOutput
+        Get poOutputBox to hoOutput
+        Send End_of_Data of hoOutput
+        Set piLastErrorEnd of hoOutput to 0
+        Send Activate of hoOutput
+    End_Procedure
+
+    // Next Error: the next line of a failed test; after the last one, the first one again.
+    Procedure DFUnitNextError
+        Handle hoOutput
+        Get poOutputBox to hoOutput
+        Send FindNextError of hoOutput
+        Send Activate of hoOutput
+    End_Procedure
+
+End_Class

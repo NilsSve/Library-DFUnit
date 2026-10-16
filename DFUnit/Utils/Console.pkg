@@ -6,7 +6,7 @@ External_Function DFUnit_WinAPI_TerminateProcess "TerminateProcess" Kernel32.dll
 // A unit-test build runner only needs to emit its results and return an exit
 // code, then die. ExitProcess runs DLL_PROCESS_DETACH for every loaded DLL;
 // with the heavy COM/ActiveX UI a host app may instantiate (e.g. CodeJock
-// command bars, Scintilla) that teardown can deadlock and the process then
+// command bars, editor controls) that teardown can deadlock and the process then
 // never ends - breaking unattended/CI runs. TerminateProcess ends the process
 // immediately, skips DLL detach so it cannot deadlock, and still sets the exit
 // code. Console output is already flushed (WriteConsoleW is synchronous).

@@ -117,20 +117,25 @@ Class cDFUnitTestApplication is a cDFUnitFixture
     Procedure AutoRun
         Boolean bUseUI
         Integer iExitCode
+        Handle hoPanel
         
         Send ParseEnvironmentFromCommandLine
         Get pbUseUI to bUseUI
         
         If (bUseUI or (IsDebuggerPresent() and pbUseUIIfInDebugger(Self))) Begin
-            // Show the framework's own test-runner window - but only when the host program has not
-            // supplied a UI of its own. Every DataFlex Panel sets phoMainPanel of ghoApplication in
-            // its End_Construct_Object, so a non-zero handle here means the host already owns the
-            // interface; it called AutoRun purely for the command-line arbitration above and will
-            // activate its own view. A host may also suppress this outright with pbUseBuiltInUI.
+            // The framework's test-runner window, made here - in a run with the window only (DataFlex
+            // shows a panel as soon as it is made) and ON THE DESKTOP, where a program's main panel is.
+            // Only a child of the desktop is told that the program ends, which is when its size and place
+            // are saved (pbPreserveEnvironment); a panel made inside this object was never told, so it
+            // opened in the same size and place every time.
+            // Every DataFlex Panel sets phoMainPanel of ghoApplication in its End_Construct_Object, so a
+            // non-zero handle here means the host already owns the interface: it called AutoRun for the
+            // command-line arbitration above only and shows its own view. A host may also suppress the
+            // window outright with pbUseBuiltInUI.
             // Start_UI runs the message loop and does not return until the window is closed.
             If (pbUseBuiltInUI(Self) and (phoMainPanel(ghoApplication) = 0)) Begin
-                Object oUIApplication is a cDFUnitUIPanel
-                End_Object
+                Get Create of Desktop (RefClass(cDFUnitUIPanel)) to hoPanel
+                Send StartRunner of hoPanel
                 Start_UI
             End
         End

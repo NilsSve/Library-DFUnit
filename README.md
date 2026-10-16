@@ -45,7 +45,7 @@ list (drop `-AddProject` to add the project yourself in the Studio):
 | Copied out as | What it is |
 |---|---|
 | `AppSrc\UnitTests.src` | The test program. **This is the one you add as a project and compile.** You should not need to edit it again. |
-| `AppSrc\UnitTests.cfg` | Its project settings: 64-bit, and manifest generation off for build-server compatibility. |
+| `AppSrc\UnitTests.cfg` | Its project settings: 64-bit, manifest generation off for build-server compatibility, the program icon, and the images of the test-runner window built into the program. |
 | `AppSrc\oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
 | `AppSrc\oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
 
@@ -104,12 +104,14 @@ Now let's walk through the essentials:
 
 Should you wish to create a new project that is build-server compatible perform the following actions:
 
-1. Disable the following project options in the studio<sup>1:</sup>
-    - Build Manifest
-    - Embed Manifest
-2. Disable suffixes on 64-bit if your build script expects an unsuffixed executable name.
-
-<sup>1</sup>Is needed as studio settings might interfere with the console compiler's settings from the workspace.
+1. Disable Build Manifest and Embed Manifest (the template does): `df-cli` does not write a manifest, and
+   with them on a build-server build stops with *"manifest file cannot be found"*. The price: Windows gives the
+   program the old common controls, and the buttons of the test-runner window show their text only. A program
+   built in the Studio can have them on - the Studio writes the manifest - and its buttons show their images.
+2. List the images of the test-runner window under `[Icons]` in the project's `.cfg`, and the program icon as
+   `Icon=UnitTesting.ico` (the template does): the program does not find them in the package's `Bitmaps`
+   folder when it runs, only built into it.
+3. Disable suffixes on 64-bit if your build script expects an unsuffixed executable name.
 
 #### Project source
 
@@ -198,6 +200,21 @@ Procedure ExpectingAnError
 End_Procedure
 ```
 
+### The test-runner window
+
+`AutoRun` makes the window, `cDFUnitUIPanel`: a main panel with a ClientArea and one view, the icon
+`UnitTesting.ico`, and as its title `psProduct` of the application object. The program does not declare
+it: DataFlex shows a panel of the program as soon as it is made, so a console run would show it too.
+
+- **Run tests!** runs the tests again. **Exit** ends the program.
+- **View Top** and **View Bottom** go to the first and the last line of the output.
+- **Next Error** (also F3 or Ctrl+N) selects the next line of a failed test; after the last one it starts
+  from the top again.
+
+The window opens in the size and at the place it had when it was closed, as long as `pbPreserveEnvironment`
+of the application object is True (the default). They are kept in the registry, under `psCompany` and
+`psProduct` of the application object. In a console run (`-c`) the window is never shown.
+
 ### Application options
 
 `psTestFixtureName`, Defines the name of the root fixture (The TestApplication).
@@ -213,7 +230,7 @@ End_Procedure
 `pbUseBuiltInUI`, Whether `AutoRun` may open the framework's own test-runner window.
 Leave it True unless your program builds a runner window of its own - and even then you
 normally need not touch it: `AutoRun` skips the built-in window automatically whenever
-the program already has a main panel, so a host with its own view keeps full control.
+the program's main panel is not a `cDFUnitUIPanel`, so a host with its own view keeps full control.
 
 ### Console options
 
