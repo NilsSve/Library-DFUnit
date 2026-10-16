@@ -45,7 +45,7 @@ list (drop `-AddProject` to add the project yourself in the Studio):
 | Copied out as | What it is |
 |---|---|
 | `AppSrc\UnitTests.src` | The test program. **This is the one you add as a project and compile.** You should not need to edit it again. |
-| `AppSrc\UnitTests.cfg` | Its project settings: 64-bit, manifest generation off for build-server compatibility, the program icon, and the images of the test-runner window built into the program. |
+| `AppSrc\UnitTests.cfg` | Its project settings: 64-bit, manifest generation off for build-server compatibility, and the program icon. |
 | `AppSrc\oUnit_Tests.pkg` | The root fixture - **the only file you edit to add tests**: one `Use` line per test file. |
 | `AppSrc\oExample-Tests.pkg` | A worked example showing the fixture shape and the common assertions. Copy it, rename it, delete it when you are done with it. |
 
@@ -108,10 +108,7 @@ Should you wish to create a new project that is build-server compatible perform 
    with them on a build-server build stops with *"manifest file cannot be found"*. The price: Windows gives the
    program the old common controls, and the buttons of the test-runner window show their text only. A program
    built in the Studio can have them on - the Studio writes the manifest - and its buttons show their images.
-2. List the images of the test-runner window under `[Icons]` in the project's `.cfg`, and the program icon as
-   `Icon=UnitTesting.ico` (the template does): the program does not find them in the package's `Bitmaps`
-   folder when it runs, only built into it.
-3. Disable suffixes on 64-bit if your build script expects an unsuffixed executable name.
+2. Disable suffixes on 64-bit if your build script expects an unsuffixed executable name.
 
 #### Project source
 
@@ -205,6 +202,8 @@ End_Procedure
 `AutoRun` makes the window, `cDFUnitUIPanel`: a main panel with a ClientArea and one view, the icon
 `UnitTesting.ico`, and as its title `psProduct` of the application object. The program does not declare
 it: DataFlex shows a panel of the program as soon as it is made, so a console run would show it too.
+The window brings its own images: they are built into the program, and written to the TEMP folder as
+`DFUnit_<name>.ico` when the window opens. Nothing in the project's `.cfg` is needed for them.
 
 - **Run tests!** runs the tests again. **Exit** ends the program.
 - **View Top** and **View Bottom** go to the first and the last line of the output.

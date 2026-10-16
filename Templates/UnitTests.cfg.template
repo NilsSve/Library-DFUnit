@@ -6,8 +6,7 @@
 ; server stops with "manifest file cannot be found". Without it Windows gives the program the
 ; old common controls, and the buttons of the test-runner window show their text only. A
 ; program built in the Studio can have them on (the Studio writes the manifest).
-; Icon is the icon of the program. [Icons] are the images of the test-runner window, built
-; into the program: it does not find them in the package's Bitmaps folder when it runs.
+; Icon is the icon of the program file. The test-runner window brings its own images.
 [Application]
 IsWebApp=0
 BuildManifestFile=0
@@ -25,10 +24,3 @@ AfterCompileProcessEnabled=0
 [Version]
 Include=0
 AutoIncrementBuild=0
-[Icons]
-UnitTesting.ico=UnitTesting.ico
-RunProgram.ico=RunProgram.ico
-ActionExit.ico=ActionExit.ico
-ActionUp.ico=ActionUp.ico
-ActionDown.ico=ActionDown.ico
-ActionRight.ico=ActionRight.ico

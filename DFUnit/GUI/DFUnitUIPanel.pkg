@@ -9,10 +9,16 @@
 // so a console run (-c) - on a build server - would put a window on the screen.
 // The title of the window is psProduct of the application object.
 //
+// The window brings its own images: the class builds them into the program (Include_Resource) and writes them to
+// files in TEMP when the window opens. A program does not find a package's images when it runs, and an [Icons]
+// list in the program's .cfg does not last: the Studio writes that list itself, from the images the workspace's
+// own sources name.
+//
 // A child object made in a class's Construct_Object can have no methods of its own, so each button is a class.
 
 Use DFClient.pkg
 Use tWinStructs.pkg
+Use seq_chnl.pkg
 Use DFUnit\Reporting\ReporterManager.pkg
 Use DFUnit\Reporting\Reporters\UIListReporter.pkg
 
@@ -164,12 +170,82 @@ Class cDFUnitUIPanel is a Panel
         On_Key Key_Ctrl+Key_N  Send DFUnitNextError
     End_Procedure
 
+    // The images of the window, built into the program from the package's Bitmaps folder: compiling this procedure
+    // binds them. It is never sent.
+    { Visibility=Private }
+    Procedure DFUnitBindImages
+        Include_Resource Bitmaps\UnitTesting.ico as res_DFUnitUnitTesting type DF_RESOURCE_TYPE_BINARY
+        Include_Resource Bitmaps\RunProgram.ico as res_DFUnitRunProgram type DF_RESOURCE_TYPE_BINARY
+        Include_Resource Bitmaps\ActionExit.ico as res_DFUnitActionExit type DF_RESOURCE_TYPE_BINARY
+        Include_Resource Bitmaps\ActionUp.ico as res_DFUnitActionUp type DF_RESOURCE_TYPE_BINARY
+        Include_Resource Bitmaps\ActionDown.ico as res_DFUnitActionDown type DF_RESOURCE_TYPE_BINARY
+        Include_Resource Bitmaps\ActionRight.ico as res_DFUnitActionRight type DF_RESOURCE_TYPE_BINARY
+    End_Procedure
+
+    // Writes one of the images bound above to TEMP, as DFUnit_<name>, and answers the file's full path: a button's
+    // psImage and the panel's Icon load a file by its path. When it cannot be read or written, the bare name - the
+    // program may still find that (built in through [Icons], or on its bitmap path).
+    { Visibility=Private }
+    Function DFUnitImageFile String sResource String sName Returns String
+        String sFile
+        UChar[] uData
+        Integer iCh
+
+        Get_Environment "TEMP" to sFile
+        If (Trim(sFile) = "") Begin
+            Function_Return sName
+        End
+        If (Right(sFile, 1) <> "\") Begin
+            Move (sFile + "\") to sFile
+        End
+        Move (sFile + "DFUnit_" + sName) to sFile
+
+        Get Seq_New_Channel to iCh
+        If (iCh = DF_SEQ_CHANNEL_NOT_AVAILABLE) Begin
+            Function_Return sName
+        End
+        Direct_Input channel iCh ("resource: " + sResource)
+        If (SeqEof = False) Begin
+            Read_Block channel iCh uData -1
+        End
+        Close_Input channel iCh
+        If (SizeOfArray(uData) = 0) Begin
+            Send Seq_Release_Channel iCh
+            Function_Return sName
+        End
+        // A file that cannot be written (read-only, a folder in the way) only sets SeqEof.
+        Direct_Output channel iCh ("binary:" + sFile)
+        If (SeqEof) Begin
+            Send Seq_Release_Channel iCh
+            Function_Return sName
+        End
+        Write channel iCh uData
+        Close_Output channel iCh
+        Send Seq_Release_Channel iCh
+        Function_Return sFile
+    End_Function
+
+    // The window's icon and the buttons' images, from the files DFUnitImageFile writes.
+    { Visibility=Private }
+    Procedure DFUnitUseOwnImages
+        Handle hoView
+
+        Get poMainView to hoView
+        Set Icon to (DFUnitImageFile(Self, "res_DFUnitUnitTesting", "UnitTesting.ico"))
+        Set psImage of (oRunTestsButton(hoView)) to (DFUnitImageFile(Self, "res_DFUnitRunProgram", "RunProgram.ico"))
+        Set psImage of (oViewTop_btn(hoView)) to (DFUnitImageFile(Self, "res_DFUnitActionUp", "ActionUp.ico"))
+        Set psImage of (oViewBottom_btn(hoView)) to (DFUnitImageFile(Self, "res_DFUnitActionDown", "ActionDown.ico"))
+        Set psImage of (oNextError_btn(hoView)) to (DFUnitImageFile(Self, "res_DFUnitActionRight", "ActionRight.ico"))
+        Set psImage of (oClose_btn(hoView)) to (DFUnitImageFile(Self, "res_DFUnitActionExit", "ActionExit.ico"))
+    End_Procedure
+
     // A run in the window starts here (AutoRun sends it before Start_UI): the output box reports the runs from
     // now on, the window is shown - in the size and place it had when it was closed - and the tests run unless
     // the program was started with -n.
     Procedure StartRunner
         Boolean bAutoRunTests
 
+        Send DFUnitUseOwnImages
         Send AddReporter of ghoTestApplication (poOutputBox(Self))
         Send Activate_View of (poMainView(Self))
         Send FitViewToWindow
